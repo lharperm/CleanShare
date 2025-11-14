@@ -1,0 +1,1786 @@
+%%%%%%%%%%
+% LaTeX Problem Set Template
+% CISC 203: Discrete Mathematics for Computing II
+% Queen's University, Fall 2020
+% 
+% Adapted for CISC 320 Project Proposal
+%%%%%%%%%%
+
+\documentclass{article}
+
+%%%%%%%%%%
+% YOUR INFO
+%%%%%%%%%%
+
+\newcommand{\MyName}{CleanShare}
+\newcommand{\PSNumber}{1}
+
+%%%%%%%%%%
+% Packages
+%%%%%%%%%%
+\usepackage{amsmath, amssymb, amsthm, float, hyperref, caption}
+\usepackage{longtable}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead[L]{\MyName}
+\fancyhead[C]{CISC 320 System Design Document}
+\fancyhead[R]{Page \thepage}
+\newcommand{\VersionNumber}{1.0.0}
+\fancyfoot[R]{\VersionNumber}
+\fancypagestyle{firstpage}{%
+    \fancyhf{}
+}
+
+
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz, url}
+\usetikzlibrary{arrows.meta, calc, chains, decorations.pathreplacing, graphs, graphs.standard, matrix, positioning, shapes, trees}
+
+\usepackage{tocloft}
+\setlength{\cftbeforesecskip}{1pt} % default is ~10pt
+\setlength{\cftbeforesubsecskip}{0.5pt}
+
+%%%%%%%%%%
+% Metadata
+%%%%%%%%%%
+\title{CISC 320 System Design Document
+\\CleanShare}
+\author{Section 3 - Group 6\\David Balan\\Anthony Grecu\\Charlie Guarasci\\Liam Harper-Mccabe\\Kieron Luke\\Mark Nistor\\Kayetan Protas}
+\date{\today}
+
+%%%%%%%%%%
+% Document
+%%%%%%%%%%
+\begin{document}
+\maketitle
+\clearpage
+\tableofcontents
+\listoffigures 
+\listoftables
+\newpage
+
+
+% ============================================================
+\section{Introduction}
+% ============================================================
+\subsection{Purpose}
+This Software System Description (SSD) document provides a detailed technical blueprint for CleanShare, a desktop application that detects and blurs alcoholic beverages in images before users share them online. The SSD expands upon the Requirements Analysis Document (RAD) \cite{CleanShareRAD} by translating high-level requirements into a concrete architecture, component design, and runtime behaviour that developers can implement and maintain.
+
+The primary purpose of this document is to:
+\begin{itemize}
+    \item Describe how CleanShare’s privacy-first, offline-only requirements are realized in the system architecture and deployment model.
+    \item Specify the responsibilities and interfaces of each major subsystem (GUI, Application Core, Detection Engine, Redaction Pipeline, I/O \& Privacy, Evaluation utilities).
+    \item Provide an agreed-upon reference for developers, testers, TAs, and future maintainers so that implementation, testing, and evolution of the system all follow the same design.
+    \item Serve as a baseline for design reviews and future change requests, allowing the team to trace any modification back to the original architectural rationale.
+\end{itemize}
+
+In short, the SSD answers \emph{how} CleanShare is built and behaves internally, given the \emph{what} defined in the RAD and project outline~\cite{CISC320Outline}.
+
+\subsection{Scope}
+CleanShare targets Windows 10+ desktop systems and is built using C++17, Qt 6.x~\cite{QtDocs}, OpenCV 4.x~\cite{OpenCV}, and ONNX Runtime~\cite{ONNXRuntime}. Within this scope, the system enables users to:
+\begin{itemize}
+    \item Import a JPEG/PNG image from the local file system.
+    \item Automatically detect alcoholic beverage containers using a YOLOv11-based CNN model deployed via ONNX Runtime.
+    \item Blur detected alcoholic regions using a configurable Gaussian blur pipeline.
+    \item Preview the original and redacted images side-by-side and optionally refine blur regions using manual tools (brush/rectangle with undo/redo).
+    \item Export a finalized, ``clean'' image at the original resolution, entirely locally and offline.
+\end{itemize}
+
+The scope includes the full end-to-end workflow (import $\rightarrow$ detect $\rightarrow$ blur $\rightarrow$ preview $\rightarrow$ export), core error handling (invalid files, failed inference, no detections), performance targets (e.g., $\leq 10$~s per 1080p image on CPU), and local logging sufficient for debugging while preserving privacy.
+
+Out of scope for this version are:
+\begin{itemize}
+    \item Video or real-time stream processing (only static images are supported).
+    \item Mobile, web, or cross-platform deployments beyond Windows 10+.
+    \item Cloud-based inference, online services, or any network-dependent features.
+    \item Advanced extensions such as full batch processing, social media integration, or multiple redaction styles beyond the baseline Gaussian blur (these are considered potential future work).
+\end{itemize}
+
+\subsection{Definitions, Acronyms, Abbreviations}
+This subsection defines the key terms and acronyms used throughout the SSD so that readers can interpret the design consistently.
+
+\begin{description}
+    \item[CleanShare] The Windows desktop application being designed in this project. CleanShare automatically detects and blurs alcoholic beverages in user-supplied photos so they are ``safe to share'' on social or professional platforms, while performing all processing locally on the user’s machine.
+
+    \item[CNN (Convolutional Neural Network)] A type of deep learning model used for image-based tasks. In CleanShare, a CNN (YOLOv11-based) is used to detect alcoholic containers in images.
+
+    \item[YOLOv11] ``You Only Look Once'' version 8, a modern family of real-time object detection models~\cite{UltralyticsYOLO}. CleanShare uses a YOLOv11-derived model fine-tuned on the Liquor Data dataset and exported to ONNX format.
+
+    \item[ONNX (Open Neural Network Exchange)] A standard format for representing trained ML models~\cite{ONNXRuntime}. CleanShare ships with an ONNX model file (e.g., \texttt{model.onnx}) that encapsulates the trained detector.
+
+    \item[ONNX Runtime] The inference engine used to execute the ONNX model locally~\cite{ONNXRuntime}. CleanShare embeds ONNX Runtime libraries to run CNN inference on the CPU (and optionally GPU) without external services.
+
+    \item[OpenCV] An open-source computer vision library used for image loading, preprocessing, and blurring operations (e.g., Gaussian blur) in CleanShare~\cite{OpenCV}.
+
+
+    \item[GUI (Graphical User Interface)] The visual front-end of CleanShare, implemented using Qt Widgets. The GUI provides buttons, menus, previews, and tools for importing, editing, and exporting images.
+
+    \item[Qt] A C++ application framework used to build the CleanShare desktop GUI (windows, dialogs, widgets) and to manage application lifecycle and events~\cite{QtDocs}.
+
+
+    \item[ROI (Region of Interest)] A portion of the image that has been identified for special processing. In CleanShare, ROIs correspond to regions containing alcoholic beverages or manually selected blur areas.
+
+    \item[ROI Mask] A binary mask indicating which pixels belong to blur regions. The Redaction Pipeline uses the ROI mask to apply Gaussian blur only where required and leave the rest of the image untouched.
+
+    \item[NMS (Non-Maximum Suppression)] A post-processing step that removes duplicate or overlapping detection boxes, keeping only the highest-confidence bounding boxes returned by the CNN.
+
+    \item[Detection Engine] The logical subsystem responsible for image preprocessing, CNN inference via ONNX Runtime, NMS, and confidence thresholding. It outputs a list of detected boxes and associated scores.
+
+    \item[Redaction Pipeline] The subsystem that converts detection boxes and manual edits into an ROI mask and applies the selected blur strategy (e.g., Gaussian blur) while preserving the original image dimensions.
+
+    \item[I/O \& Privacy Module] The subsystem responsible for reading and writing images (JPEG/PNG), validating inputs, and enforcing local-only processing (no network calls, no long-term storage of sensitive data).
+
+    \item[ImageSession] An in-memory object managed by the Application Core that encapsulates the state of the currently loaded image, including original pixels, detection results, masks, configuration, and undo/redo history.
+
+    \item[Application Core] The subsystem that orchestrates the main workflow (import $\rightarrow$ detect $\rightarrow$ blur $\rightarrow$ preview $\rightarrow$ export), manages session state, and coordinates interactions among GUI, Detection Engine, Redaction Pipeline, and I/O.
+
+    \item[Evaluation Utilities] Developer-only tools that run the detector on a labeled dataset to compute metrics such as recall, false positive rate, and processing time, ensuring that CleanShare satisfies its success criteria.
+
+    \item[Liquor Data Dataset] A labeled dataset of alcoholic containers (beer, wine, spirits) from Lamar University used to train and evaluate the CNN model integrated into CleanShare~\cite{LiquorData}.
+
+    \item[1080p] An image resolution of approximately $1920 \times 1080$ pixels. CleanShare’s performance requirements are specified in terms of processing time for 1080p images on a typical CPU-only Windows laptop.
+
+    \item[Recall] The fraction of actual alcohol containers in an image that are correctly detected by the model.
+
+    \item[Precision] The fraction of predicted alcohol detections that are truly alcohol containers (i.e., not false positives).
+
+    \item[False Positive Rate] The proportion of non-alcoholic objects that are incorrectly detected (and blurred) as alcohol containers.
+
+    \item[mAP@0.5 (Mean Average Precision at IoU 0.5)] A standard object detection metric summarizing detection quality across a dataset at an Intersection-over-Union (IoU) threshold of 0.5. Used to monitor overall model performance.
+
+    \item[CPU-only Inference] Running the ONNX model solely on the system’s CPU without requiring GPU acceleration. CleanShare’s baseline performance guarantees are defined under CPU-only inference.
+
+    \item[Blur Strategy] An interchangeable implementation of the redaction effect (e.g., Gaussian blur now, possible pixelation/mosaic later) selected by the Redaction Pipeline based on configuration or user preference.
+\end{description}
+
+\subsection{Overview of Document}
+This document provides a high-level and detailed system overview of CleanShare, from architecture down to component APIs and runtime behaviour. It is organized as follows:
+\begin{itemize}
+    \item \textbf{Section 2: System Overview} describes the overall context in which CleanShare operates, major subsystems at a glance, and the primary user workflow from image import to export.
+    \item \textbf{Section 3: Architectural Design (4+1 Views)} presents the logical, process, development, physical/deployment, and use-case views that jointly describe the system’s architecture.
+    \item \textbf{Section 4: External Interface Design} specifies user interfaces, file formats, OS/hardware interfaces, and the model/artifact interfaces used by CleanShare.
+    \item \textbf{Section 5: Data Design} defines the core data structures (images, boxes, masks, session state), configuration parameters, and persistence strategy.
+    \item \textbf{Section 6: Component Design} refines logical modules into concrete runtime components, detailing their responsibilities, APIs, and relevant design patterns.
+    \item \textbf{Section 7: Dynamic Behavior} explains how components interact at runtime using sequence diagrams and state machines for key workflows.
+    \item \textbf{Section 8: Error Handling, Logging, and Telemetry} describes how the system categorizes, surfaces, and recovers from errors while maintaining privacy-preserving, local-only logging.
+    \item \textbf{Section 9: Security \& Privacy Design} presents the privacy principles, threat model, and access-control considerations that enforce a privacy-first posture.
+    \item \textbf{Section 10: Performance, Capacity, and Quality Attributes} documents performance targets, scalability considerations, and usability/accessibility goals.
+    \item \textbf{Section 11: Deployment \& Installation} outlines how CleanShare is packaged, distributed, and configured on Windows desktops.
+    \item \textbf{Section 12: Build, CI/CD, and Configuration Management} explains build tooling, the CI pipeline, versioning (including model versioning), and configuration management practices.
+    \item \textbf{Section 13: Verification \& Validation Strategy} details the testing strategy (unit, integration, system, regression) and dataset-based evaluation of model performance.
+    \item \textbf{Section 14: Requirements-to-Design Traceability} maps each major functional and non-functional requirement to the design elements that satisfy it.
+    \item \textbf{Section 14: Design Rationale and Architectural Decisions (ADRs)} summarizes key design choices, trade-offs, and why specific technologies and patterns were selected.
+    \item \textbf{Section 15: Risks and Mitigations} identifies major technical and project risks and how they are mitigated.
+    \item \textbf{Section 16: Maintenance \& Support} describes how the system is structured for ongoing updates, bug fixes, and documentation upkeep.
+    \item \textbf{Section 17: Requirements-to-Design Traceability} maps each major functional and non-functional requirement to the design elements that satisfy it.
+    \item \textbf{Appendices} provide a glossary extension and references to the RAD, project outline, library documentation, and dataset/model sources.
+\end{itemize}
+
+This structure ensures that readers can start from a high-level understanding and progressively drill down to specific components, interfaces, and test plans as needed.
+
+% ============================================================
+\section{System Overview}
+% ============================================================
+\subsection{Context}
+CleanShare exists as a standalone desktop application running locally on user hardware. It interacts with external systems only to load and save image files, and no network communication is used. The system’s primary goals are to protect user privacy, provide effective and accurate detection of alcoholic beverages, and produce final images ready to be shared online. CleanShare integrates Qt UI, OpenCV processing, and ONNX runtime inference into a single workflow to ensure quick and accurate image blurring.
+
+\subsection{System Decomposition (at a glance)}
+CleanShare can be broken down into five major subsystems:
+\begin{enumerate}
+    \item Presentation Layer (Qt GUI)
+    Includes the MainWindow Class and supports the main UI operations such as image import, preview of original vs. blurred, manual editing, and export options. 
+    
+    \item Application Core
+    Includes the AppControllerClass and manages state, workflow, and transitions. Also handles configuration for blur type.
+    
+    \item  Detection
+    Includes the ONNX Detector and Heuristic Detector classes and controls preprocessing, ONNX Runtime CNN inference, post-processing with confidence threshold, and an optional fallback on the heuristic detector.
+
+    
+    \item Redaction
+    Includes the RedactionPipeline Class, which builds a mask from detection boxes and applies blurring. 
+    
+    \item IO and Utils
+    Includes the ImageIO and EvaluationService classes and is responsible for loading the JPEG/PNG and writing the blurred output. This layer ensures all operations remain local-only and holds only temporary in-memory data to maintain user privacy.
+    
+\end{enumerate}
+
+\subsection{Primary User Workflow}
+\begin{enumerate}
+    \item Import Image 
+    The user uploads a JPEG or PNG, and the system performs file existence check, pixel loading via OpenCV, dimension recording, and highlights errors with import if they exist.
+    
+    \item Pre-Processing and Detection
+    The CNN model identifies alcoholic beverage containers by running the ONNX inference, generating candidate bounding boxes, applying NMS to filter duplicates, and removing low-confidence detections
+
+    All detections are mapped back to the original image size, and the system builds ROI masks, bounding box overlays, data for UI preview, and if no alcohol is detected, the UI informs the user and allows manual marking. 
+    
+    \item Blur and Post-Processing
+    The system applies a Gaussian blur to all ROI regions in a non-destructive pipeline, so the user can undo/redo changes
+
+    \item Preview/Edit
+    User sees a side-by-side view (original vs. blurred) and may add or remove blurred regions and adjust blur strength
+    
+    \item Export
+    User exports the final, sanitized image at original resolution.
+    
+\end{enumerate}
+
+% ============================================================
+\section{Architectural Design (4+1 Views)}
+% ============================================================
+\subsection{Logical View}
+CleanShare is a Windows desktop application written in C++ and built using Qt, OpenCV, and ONNX Runtime. The system is divided into several logical modules that work together to implement all user facing and internal features. These modules include the Presentation layer implemented with Qt, the Application Core that manages workflow and state, the Detection Engine that performs model inference, the Redaction Pipeline that creates and applies blur masks, the IO and Privacy module responsible for file handling and data protection, and an Evaluation Utilities module for developer testing. These components form the logical structure required to support all detection, blurring, and export features of the application.
+
+\subsubsection{Modules and Responsibilities}
+\begin{itemize}
+  \item \textbf{Qt GUI}: file open/save, side-by-side preview, blur strength, manual tools (brush/rectangle). 
+
+The Presentation module (GUI) provides the user interface for importing images, triggering detection, editing redaction regions, previewing the original and blurred versions, and exporting results. It stores only UI related data such as the current screen, selected tool, zoom level, and temporary preview images. This module communicates exclusively with the Application Core, sending user commands and receiving updates to refresh the interface.
+
+  \item \textbf{Application Core}: orchestration, state/config (thresholds, blur type). 
+
+The Application Core orchestrates the entire workflow including image import, detection, mask creation, redaction, preview updates, and final export. It maintains session state such as the loaded image, detection results, blur regions, undo and redo history, and user configuration. It is responsible for coordinating all interactions with IO operations, model inference, and redaction computations.
+
+  \item \textbf{Detection Engine}: preprocessing, ONNX inference, NMS, thresholds. 
+
+The Detection Engine is responsible for preprocessing the image for inference, running ONNX Runtime using the YOLOv11 based model, applying non maximum suppression, filtering low confidence predictions, and producing detection results mapped back to the original image coordinates. It owns the loaded model weights and all preprocessing configuration.
+
+  \item \textbf{Redaction Pipeline}: ROI mask creation, Gaussian/pixelate/mosaic. 
+
+The Redaction Pipeline builds region of interest masks using model detections and any manual regions added by the user. It then applies blur or another redaction style through OpenCV to produce a final modified image. It maintains internal mask representations and redaction
+parameters.
+  
+  \item \textbf{I/O \& Privacy}: JPEG/PNG I/O, local-only processing, ephemeral metadata. 
+
+The IO and Privacy module loads and validates PNG and JPEG files, saves exported results, and ensures that all processing remains local with no external transmission or persistent storage of sensitive information. It handles temporary buffers and optional configuration files.
+
+% OPTIONAL
+    \item \textbf{Evaluation Utilities}:
+    
+The Evaluation Utilities module supports developer level testing by measuring accuracy metrics such as recall, precision, false positives, and Mean Average Precision (MAP). It also records inference times and can output reports. It interacts with the Detection Engine and Redaction Pipeline but is not used during normal user operation.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{logical_view.png}
+    \caption{Logical View}
+    \label{fig:LogicalView}
+\end{figure}
+
+\subsubsection{Key Interfaces (logical)}
+Public interfaces between modules; data passed (images, boxes, masks). 
+The Presentation layer communicates with the Application Core through high level commands such as `importImage`, `requestDetection`, `requestRedaction`, `requestExport`, and `userCancelled`. The Application Core communicates with the Detection Engine through operations such as `preprocessForDetection`, `runInference`, and `postprocessDetections`. It interacts with the Redaction Pipeline by invoking `buildMask` and `applyBlur`. IO operations such as `loadAndValidateImage` and `saveImage` allow the Application Core to read and write image data. The Application Core may also call `runEvaluation` in the Evaluation Utilities module to produce developer level metrics. All data exchanged between modules consists of file paths, image buffers, region descriptors, and configuration values.
+
+
+
+\subsection{Process View}
+Thread/process model, responsiveness targets, cancellation during inference, progress reporting.
+
+\textit{CleanShare} uses a multithreaded execution model in which the GUI thread is responsible for rendering windows, handling user interaction, and updating the interface, while a worker thread executes long running tasks such as model inference and redaction. The evaluation utilities may run in the same process or in a separate executable but are not part of the main application workflow. This approach ensures that the application remains responsive and smooth, even when processing large images.
+
+During the main runtime flow, the user launches the application and imports an image through the Presentation layer. The Application Core validates the image through the IO module and, once successful, posts a detection job. The Detection Engine preprocesses the image, runs inference through ONNX Runtime, and postprocesses the raw model outputs. The Application Core then instructs the Redaction Pipeline to build an ROI mask and apply blur to produce a redacted version. The worker thread returns the blurred result to the Presentation layer, which updates the preview. The user can optionally adjust the blurred regions manually, and the Application Core reprocesses them through the Redaction Pipeline. Finally, the user exports the blurred image, and the Application Core saves it using the IO module.
+
+\textit{Alternate flows} cover scenarios with no detections, invalid files, or slow inference. When no detections are returned, the Application Core notifies the Presentation module, which enables manual region editing. When an invalid image is provided, the IO module returns an error message that is propagated to the user. If inference is slow, progress updates are periodically sent and the user can cancel the operation, which stops the worker thread and returns the application to a stable state. All concurrency behaviour maintains thread safety by ensuring that the Presentation layer is updated only from the GUI thread, and that session state is protected against concurrent modification.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.99\linewidth]{process_view.png}
+    \caption{Process View Sequence}
+    \label{fig:ProcessView}
+\end{figure}
+
+\subsection{Development View}
+Repo layout, module boundaries, third-party libs (Qt, OpenCV, ONNX Runtime), coding standards. 
+
+The \textit{CleanShare} codebase is organized into directories that correspond to the system’s logical modules. The `gui` directory contains Qt windows, widgets, and controllers. The core directory contains the application controller, workflow orchestration logic, and the session state. The detection directory includes ONNX Runtime integration and all preprocessing and postprocessing functions. The redaction directory implements the ROI mask creation and blur operations. The io directory handles image validation, loading, and saving. The eval directory contains the evaluation tools used in development. A ` third party ` directory stores external headers or wrappers, and a test directory includes all unit and integration tests.
+
+The dependency rules ensure that `gui` depends only on core, and core depends on detection, redaction, and io. The detection module depends on OpenCV and ONNX Runtime, while redaction depends on OpenCV. The io module depends on Qt and OpenCV. The eval module uses detection and redaction. No module below `gui` depends upward on `gui`. The system uses C++17, Qt 6 for the GUI, OpenCV 4 for image processing, ONNX Runtime for model inference, and `CMake` or `qmake` as its build system.
+
+Configuration files such as `model.onnx` are stored in the program directory. User preferences may be stored using `QSettings` or a small JSON file. Unit tests independently verify each module, and integration tests run the entire pipeline on sample images to ensure correctness. This structure provides clarity for developers and supports modular development.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{image.png}
+    \caption{Development View}
+    \label{fig:placeholder}
+\end{figure}
+
+
+\subsection{Physical/Deployment View}
+Target: Windows 10+ desktop; optional GPU. Packaging, installers, runtime dependencies. 
+
+\textit{CleanShare} is deployed as a Windows desktop application running on Windows 10 or later. It requires at least 8 GB of RAM, and all inference is performed locally on the CPU, typically in less than 10 seconds for a 1080p image. GPU usage is optional. Network connectivity is not required, and the application does not transmit or store any private data externally.
+
+The deployment artifacts include the main \textit{CleanShare} executable, the `model.onnx` weight file, all required Qt, OpenCV, and ONNX Runtime libraries, an optional configuration file, and an optional evaluation executable. The deployment topology consists of a single user machine running a single application process with no external servers or databases. All images remain on the local machine.
+
+The installation is performed through an MSI or EXE installer that installs the application, dependencies, and model file in appropriate program directories. Shortcuts may be registered. Uninstallation removes all application files, but leaves user exported images untouched.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{phys_depl_view.png}
+    \caption{Physical/Deployment View}
+    \label{fig:PhysDeploymentView}
+\end{figure}
+
+\subsection{Scenarios (Use-Case View)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{use_case.png}
+    \caption{Use Case Diagram}
+    \label{fig:UseCase}
+\end{figure}
+
+\begin{itemize}
+  \item UC-1: Blur a photo and export (main path + alternate flows: no detections, invalid file, cancel). % \textbf
+    \begin{enumerate}
+      \item The user selects ``Import image'' in the GUI and chooses an image from the local file system.
+      \item CleanShare validates the image format and loads it into the current session.
+      \item The user starts automatic detection. The Detection Engine preprocesses the image, runs ONNX inference, and returns detections to the Application Core.
+      \item The Application Core passes the detections to the Redaction Pipeline, which builds an ROI mask and applies the configured redaction style (for example blur or pixelation).
+      \item The GUI displays a side-by-side preview of the original and redacted images.
+      \item The user optionally adjusts blur strength or redaction style, and the Redaction Pipeline updates the redacted result.
+      \item The user chooses ``Export image'' and selects an output path on the local file system.
+      \item CleanShare saves the redacted image and confirms successful export to the user.
+    \end{enumerate}
+  \item UC-2: Manually edit ROIs (add/remove, undo/redo).
+
+    \begin{enumerate}
+      \item The user activates the manual editing mode and selects a tool (brush or rectangle) in the GUI.
+      \item The user adds new ROIs by drawing on the image. Each new region is recorded by the Application Core and added to the current ROI mask.
+      \item The user removes or shrinks existing ROIs if detection was overly conservative.
+      \item The user uses undo and redo controls to refine edits until satisfied.
+      \item The Redaction Pipeline rebuilds the ROI mask and reapplies the chosen redaction style to produce an updated redacted image.
+      \item The GUI updates the preview to show the new redacted result.
+    \end{enumerate}
+
+  \item UC-3 (optional): Batch process folder. 
+    \begin{enumerate}
+      \item The user selects ``Batch process folder'' and chooses a directory on the local file system.
+      \item CleanShare scans the folder for supported image files.
+      \item For each image, CleanShare performs the steps from UC-1 (import, validate, detect, redact, and export), using default redaction parameters.
+      \item Redacted copies are written to an output folder or written alongside the originals with modified filenames.
+    \end{enumerate}
+
+\end{itemize}
+
+% ============================================================
+\section{External Interface Design}
+% ============================================================
+\subsection{User Interface (UI)}
+
+The following figures illustrate the foundational wireframes for CleanShare.
+
+Figure~\ref{fig:ui-home} presents the home page, serving as the primary entry point for users.  
+Figure~\ref{fig:ui-tos} depicts the Terms of Service (TOS) acceptance pop-up displayed over the home page.  
+Figure~\ref{fig:ui-unsupported} shows the error message that appears when a file of an unsupported format is uploaded.  
+Figure~\ref{fig:ui-preview} demonstrates the preview screen, which displays both the preprocessed and processed images side by side.  
+Figure~\ref{fig:ui-edit} illustrates the edit screen, where users can employ a brush tool to manually apply blur to specific areas of the image.
+
+These are wireframes only; the final implementation is expected to expand the visual design and functionality, including potential future batch processing and editing features.
+
+\begin{figure}[H]\centering
+  \includegraphics[width=0.9\linewidth]{Homepage (figure 1).png}
+  \caption{Home page wireframe: primary landing/upload screen for CleanShare.}
+  \label{fig:ui-home}
+\end{figure}
+
+\begin{figure}[H]\centering
+  \includegraphics[width=0.9\linewidth]{TOS page (Figure 2).png}
+  \caption{TOS acceptance pop-up shown over the home page.}
+  \label{fig:ui-tos}
+\end{figure}
+
+\begin{figure}[H]\centering
+  \includegraphics[width=0.9\linewidth]{Unsupported filetype (figure 3).png}
+  \caption{Unsupported file type error message.}
+  \label{fig:ui-unsupported}
+\end{figure}
+
+\begin{figure}[H]\centering
+  \includegraphics[width=0.9\linewidth]{Preview page (figure 4).png}
+  \caption{Preview screen showing preprocessed (original) and processed (blurred) images.}
+  \label{fig:ui-preview}
+\end{figure}
+
+\begin{figure}[H]\centering
+  \includegraphics[width=0.9\linewidth]{Edit mode page (Figure 5).png}
+  \caption{Edit screen with brush tool for manual blur adjustments.}
+  \label{fig:ui-edit}
+\end{figure}
+
+\subsection{File Interfaces}
+
+\subsubsection*{Supported Input/Output Types}
+
+CleanShare supports the import and export of JPEG (\texttt{.jpg/.jpeg}) and PNG (\texttt{.png}) image formats. These formats were chosen for their wide compatibility and high-quality support.
+
+\begin{itemize}
+  \item \textbf{Input:} Users can import images from the local file system in the supported formats.
+  \item \textbf{Output:} Processed images are exported in the same format as the input by default, with optional future support for explicit format selection.
+\end{itemize}
+
+\subsubsection*{Image Validation Rules}
+
+To ensure reliable processing and prevent errors, CleanShare validates images according to the following rules:
+
+\begin{enumerate}
+  \item \textbf{File Type:} Only PNG and JPEG files are accepted.
+  \item \textbf{File Size:} Images exceeding 10~MB are rejected.
+  \item \textbf{Dimensions:} Minimum 200$\times$200 pixels, maximum 8000$\times$8000 pixels.
+  \item \textbf{Integrity:} Corrupted or unreadable files trigger an error message.
+  \item \textbf{Aspect Ratio:} Freeform aspect ratios are allowed; extremely large dimensions may be downscaled for performance.
+\end{enumerate}
+
+Invalid images are reported immediately to the user through the GUI so that the current session state remains unaffected.
+
+\subsubsection*{Export Naming and Versioning}
+
+To avoid file overwrites and maintain clarity, CleanShare uses the following structured naming convention for exported images:
+
+\verb|[original_filename]_[edit_mode]_v[version]_[YYYYMMDD_HHMMSS].[ext]|
+
+\begin{itemize}
+  \item \textbf{original\_filename:} Name of the input file.
+  \item \textbf{edit\_mode:} The redaction method applied (e.g., \texttt{brush}, \texttt{auto}).
+  \item \textbf{version:} Incremental number for successive edits.
+  \item \textbf{timestamp:} Exact export time.
+  \item \textbf{ext:} File extension (matches input format by default).
+\end{itemize}
+
+This naming scheme ensures exported images are uniquely identifiable, self-descriptive, and traceable. The Application Core manages version increments and prevents filename conflicts automatically.
+
+\subsection{OS/Hardware Interfaces}
+
+CleanShare is designed for Windows~10 and later and interacts with the operating system through standard Windows APIs as well as optional GPU hardware acceleration.
+
+\subsubsection*{Windows APIs}
+
+\begin{itemize}
+  \item \textbf{File Dialogs:} Uses native Windows file open/save dialogs (e.g., \texttt{GetOpenFileName}, \texttt{GetSaveFileName}) via Qt wrappers to allow users to select images for import and export.
+  \item \textbf{Paths and Filesystem:} File path handling, validation, and directory scanning utilize standard Windows APIs or Qt’s cross-platform \texttt{QFile}, \texttt{QDir}, and \texttt{QStandardPaths}.
+  \item \textbf{Windowing \& Events:} Qt leverages Windows message handling for GUI rendering, window management, and event loops.
+\end{itemize}
+
+\subsubsection*{Optional GPU}
+
+CleanShare performs all image processing and model inference on the CPU by default. If a compatible GPU is available, ONNX Runtime may optionally use CUDA or DirectML backends to accelerate model inference, reducing processing time for large images. GPU acceleration is intended to be transparent to the user; the application detects available hardware at runtime and selects the optimal execution provider.
+
+\subsubsection*{Local Processing}
+
+\begin{itemize}
+  \item All operations are performed locally, with no network communication.
+  \item Temporary buffers and ephemeral metadata remain in system memory or temporary files and are cleared upon completion.
+\end{itemize}
+
+This design ensures compatibility across standard Windows desktops while allowing optional hardware acceleration to improve performance for high-resolution images.
+
+\subsection{Model/Artifact Interfaces}
+
+CleanShare relies on a machine learning model stored as an ONNX (\texttt{.onnx}) file for automatic detection of sensitive regions in images. The system defines clear interfaces for locating, validating, and using this artifact to ensure reliable and reproducible results.
+
+\subsubsection*{Model File Format}
+
+\begin{itemize}
+  \item The detection model is stored in ONNX format, allowing interoperability across frameworks and efficient inference with ONNX Runtime.
+  \item The model includes all learned weights, preprocessing configurations, and metadata required for detection.
+\end{itemize}
+
+\subsubsection*{Versioning}
+
+\begin{itemize}
+  \item Each model file includes a version number embedded in its filename (e.g., \texttt{yolov11\_v1.onnx}) and optionally within its metadata.
+  \item Versioning ensures that updates to the detection model do not unintentionally overwrite previous versions, allowing reproducible results and backward compatibility with previously processed images.
+\end{itemize}
+
+\subsubsection*{Path Resolution}
+
+\begin{itemize}
+  \item The Application Core resolves the model path using relative paths within the program directory by default.
+  \item The system may optionally allow user-specified model paths through configuration files or GUI selection for testing or evaluation purposes.
+  \item Cross-platform path handling is abstracted through Qt’s \texttt{QDir} and \texttt{QFile} APIs to ensure compatibility with Windows filesystem conventions.
+\end{itemize}
+
+\subsubsection*{Integrity Checks}
+
+\begin{itemize}
+  \item To ensure model reliability and prevent corrupted or tampered files, CleanShare performs hash-based integrity checks on the model file before loading.
+  \item If a hash mismatch is detected, the Application Core reports an error to the user and halts automatic detection.
+  \item This mechanism guarantees that the model used during inference matches the expected version and configuration.
+\end{itemize}
+
+% ============================================================
+\section{Data Design}
+% ============================================================
+\subsection{Core Data Structures}
+
+CleanShare’s data model is intentionally small and image-centric. All core data structures are designed to
+(1) keep image and mask dimensions tightly aligned, and (2) avoid storing any long-lived user content beyond
+what is strictly needed for the active session.
+
+\paragraph{Image representation.}
+Internally, images are represented as an \texttt{Image} object, which wraps the underlying OpenCV
+matrix and relevant metadata:
+
+\begin{itemize}
+  \item \texttt{cv::Mat pixels} (or equivalent): BGR 8-bit, 3-channel image buffer.
+  \item \texttt{int width}, \texttt{int height}: pixel dimensions.
+  \item \texttt{ImageFormat format}: logical format enum (\texttt{JPEG}, \texttt{PNG}, \texttt{Unknown}).
+  \item \texttt{bool isPreview}: flag indicating whether this is a downscaled preview copy or the full-resolution original.
+\end{itemize}
+
+The following invariants are enforced:
+\begin{itemize}
+  \item The ``original'' \texttt{Image} keeps the exact width, height, and format from disk.
+  \item All masks and bounding boxes stored in the session are defined relative to the original image resolution.
+  \item Preview images may be downscaled, but always maintain aspect ratio and a bijective mapping between preview
+        coordinates and original coordinates.
+\end{itemize}
+
+\paragraph{Detection boxes and results.}
+The Detection Engine exposes its outputs through a small set of data types:
+
+\begin{itemize}
+  \item \textbf{\texttt{BoundingBox}}:
+  \begin{itemize}
+    \item \texttt{float xCenter}, \texttt{float yCenter}: center of the box in normalized coordinates $[0, 1]$.
+    \item \texttt{float width}, \texttt{float height}: box size in normalized coordinates $[0, 1]$.
+    \item \texttt{float confidence}: model confidence score $[0, 1]$ after thresholding.
+    \item \texttt{int classId}: numeric class identifier (for now, typically a single ``alcohol'' class).
+  \end{itemize}
+
+  \item \textbf{\texttt{DetectionResult}}:
+  \begin{itemize}
+    \item \texttt{std::vector<BoundingBox> boxes}: final boxes after NMS and confidence filtering.
+    \item \texttt{std::string modelVersion}: semantic version tag of the ONNX model used.
+    \item \texttt{double inferenceMs}: measured inference time in milliseconds (used for performance evaluation).
+  \end{itemize}
+\end{itemize}
+
+Boxes are stored in normalized coordinates so they remain valid if the working image is temporarily resized for
+pre-processing; the Application Core is responsible for mapping them back to original-pixel coordinates when
+building masks and overlays.
+
+\paragraph{Masks and manual edits.}
+Redaction is implemented with binary masks aligned to the original image resolution:
+
+\begin{itemize}
+  \item \textbf{\texttt{Mask}}:
+  \begin{itemize}
+    \item Internally represented as a single-channel 8-bit \texttt{cv::Mat} with size $(\texttt{height}, \texttt{width})$.
+    \item Pixel value \texttt{0}: not masked (no blur applied).
+    \item Pixel value \texttt{255}: masked (blur applied).
+  \end{itemize}
+
+  \item \textbf{\texttt{Stroke}} (for brush tools):
+  \begin{itemize}
+    \item \texttt{std::vector<Point> points}: sampled cursor positions in original-image coordinates.
+    \item \texttt{int radius}: brush radius in pixels.
+    \item \texttt{StrokeMode mode}: enum (\texttt{Add}, \texttt{Erase}) indicating whether to add to or remove from the mask.
+  \end{itemize}
+
+  \item \textbf{\texttt{RectEdit}} (for rectangle tools):
+  \begin{itemize}
+    \item \texttt{Rect bounds}: top-left + bottom-right in original-image coordinates.
+    \item \texttt{RectMode mode}: enum (\texttt{Add}, \texttt{Erase}).
+  \end{itemize}
+\end{itemize}
+
+The Redaction Pipeline maintains at most three masks per session:
+\begin{itemize}
+  \item \texttt{autoMask}: pixels derived solely from model detections.
+  \item \texttt{manualMask}: pixels introduced or removed via manual tools.
+  \item \texttt{combinedMask}: the effective ROI used for blur, derived by combining auto and manual masks.
+\end{itemize}
+
+\paragraph{Session state.}
+All state needed for a single image is encapsulated in an \texttt{ImageSession} object owned by the
+\texttt{SessionController}. A typical definition is:
+
+\begin{itemize}
+  \item \texttt{Image originalImage};
+  \item \texttt{Image previewImage};  % may be downscaled
+  \item \texttt{Image redactedImage}; % full-res redacted result
+  \item \texttt{DetectionResult detections};
+  \item \texttt{Mask autoMask};
+  \item \texttt{Mask manualMask};
+  \item \texttt{Mask combinedMask};
+  \item \texttt{DetectionConfig detectionConfig};
+  \item \texttt{BlurConfig blurConfig};
+  \item \texttt{UndoStack<Command> undoStack}, \texttt{RedoStack<Command> redoStack};
+  \item \texttt{SessionState state}; % Idle, Loaded, Detected, Edited, Exported
+\end{itemize}
+
+Key invariants:
+\begin{itemize}
+  \item All masks and the \texttt{redactedImage} share the same resolution as \texttt{originalImage}.
+  \item The undo/redo stacks only contain reversible operations on \texttt{manualMask}; they do not persist image data.
+  \item When \texttt{state} is \texttt{Exported}, the in-memory data still represent the last previewed result, so a user can
+        re-export without re-running detection.
+\end{itemize}
+
+
+\subsection{Configuration}
+
+Configuration values are split between detection behaviour, redaction behaviour, and UI preferences. The
+Application Core treats these as structured objects so that they can be validated and overridden consistently.
+
+\paragraph{Detection configuration (\texttt{DetectionConfig}).}
+This structure controls how the Detection Engine filters model outputs:
+
+\begin{itemize}
+  \item \texttt{float confidenceThreshold}: minimum score for a box to be kept (e.g., default $0.5$).
+  \item \texttt{float nmsIoUThreshold}: Intersection-over-Union threshold for NMS suppression (e.g., default $0.45$).
+  \item \texttt{int maxDetections}: optional cap on number of detections per image to bound runtime.
+  \item \texttt{IntSize inputSize}: logical model input resolution (e.g., $640\times640$).
+\end{itemize}
+
+These values are typically initialized from the global configuration file and may be adjusted per session (for
+example, a ``High Sensitivity'' mode may lower \texttt{confidenceThreshold}). Any changes made via the GUI are
+reflected in the in-memory \texttt{DetectionConfig} but need not be persisted unless explicitly supported by
+the settings UI.
+
+\paragraph{Blur configuration (\texttt{BlurConfig}).}
+This structure encapsulates redaction parameters:
+
+\begin{itemize}
+  \item \texttt{BlurType type}: enum selecting the active \texttt{BlurStrategy}
+        (e.g., \texttt{Gaussian}, future \texttt{Pixelation}).
+  \item \texttt{int kernelSize}: odd-valued kernel size in pixels for Gaussian blur (e.g., default 21).
+  \item \texttt{double sigma}: standard deviation parameter for Gaussian blur (may be derived from kernel size).
+  \item \texttt{float previewScale}: factor $(0,1]$ used for generating preview images to balance speed and fidelity.
+\end{itemize}
+
+The Redaction Pipeline reads \texttt{BlurConfig} on every call to \texttt{apply} so changes to blur strength or type
+take effect immediately.
+
+\paragraph{UI preferences (\texttt{UiPreferences}).}
+Lightweight, non-critical preferences are grouped separately so they can be persisted without touching core
+algorithm configuration:
+
+\begin{itemize}
+  \item \texttt{QString lastOpenDir}, \texttt{QString lastExportDir};
+  \item \texttt{bool showGridOverlay};
+  \item \texttt{bool syncZoomBetweenPanes};
+  \item \texttt{Theme theme}: enum (\texttt{Light}, \texttt{Dark}, \texttt{SystemDefault}).
+\end{itemize}
+
+\paragraph{Defaults and override order.}
+CleanShare uses the following precedence when resolving configuration values:
+
+\begin{enumerate}
+  \item \textbf{Compile-time defaults}: safe baseline values hard-coded in the application.
+  \item \textbf{Config file}: if present and valid, overrides the compile-time defaults.
+  \item \textbf{Session overrides}: changes made by the user in the running session (e.g., slider for blur strength).
+\end{enumerate}
+
+Session overrides live only in memory; they are discarded when the application closes unless explicitly written
+back to the config file by a future ``Save Settings'' feature.
+
+
+\subsection{Persistence Strategy}
+
+The persistence strategy is deliberately minimal to maintain the privacy-first requirement. Only three kinds
+of artifacts are ever written to disk:
+
+\begin{itemize}
+  \item \textbf{Exported images}:
+  \begin{itemize}
+    \item Written to a user-selected path via \texttt{IOService::saveImage}.
+    \item Preserve original resolution and, by default, original format (JPEG in $\rightarrow$ JPEG out, PNG in $\rightarrow$ PNG out)
+          unless the user explicitly chooses a different extension.
+    \item Never overwritten without an explicit user confirmation handled by the standard file-save dialog.
+  \end{itemize}
+
+  \item \textbf{Configuration file}:
+  \begin{itemize}
+    \item A small file (e.g., \texttt{config.json} or \texttt{settings.ini}) located in the application directory or
+          a standard per-user settings location.
+    \item Stores non-sensitive data: detection thresholds, blur defaults, and UI preferences.
+    \item If the file is missing or corrupted, CleanShare falls back to compile-time defaults and may
+          regenerate a fresh configuration on next launch.
+  \end{itemize}
+
+  \item \textbf{Local logs} (optional):
+  \begin{itemize}
+    \item A rotating text log (e.g., \texttt{logs/cleanshare.log}) for debugging; capped in size or age.
+    \item Contains only high-level events and timing (e.g., ``image loaded'', ``inference took 820 ms'').
+    \item Never stores raw pixels, masks, bounding boxes, or user file paths beyond what is unavoidable
+          for diagnosing errors (and even then, file paths may be truncated or hashed).
+  \end{itemize}
+\end{itemize}
+
+The system \emph{does not} persist the following:
+
+\begin{itemize}
+  \item In-memory images, masks, or detection results once the session is closed.
+  \item Any temporary files in the application’s own directories; short-lived intermediates are kept in RAM.
+  \item User identifiers, usage analytics, or telemetry of any kind.
+\end{itemize}
+
+Clean-up policy is simple by design:
+
+\begin{itemize}
+  \item Exported images are considered user-owned and are not modified or deleted by CleanShare.
+  \item Log files may be trimmed at startup (for example, deleting logs older than a fixed retention window
+        or truncating to a maximum size).
+  \item If a future evaluation tool writes metrics (e.g., CSV reports) for developers, it does so in a clearly
+        separate directory and is disabled in end-user builds.
+\end{itemize}
+
+
+\subsection{Internationalization/Localization (if any)}
+
+For the current course deliverable, CleanShare targets an English-only audience, so internationalization is
+kept intentionally minimal. The data design, however, avoids making localization impossible later:
+
+\begin{itemize}
+  \item All user-facing strings are exposed through Qt mechanisms (e.g., \texttt{QString} and resource files),
+        rather than hard-coding narrow character types; this allows future extraction into \texttt{.ts} translation files.
+  \item File paths and image names are stored as \texttt{QString} to support Unicode filenames on Windows,
+        independent of locale.
+  \item Configuration keys are ASCII-only, but their values (such as last-used directories) can contain
+        arbitrary Unicode as supported by the OS.
+  \item The system does not store or present any locale-specific date/time or number formats in persistent
+        data; all timing information used for performance evaluation is internal and, if logged, is written
+        in a simple numeric form.
+\end{itemize}
+
+As a result, the current build can reasonably assume an English UI while leaving a straightforward path to
+future localization: UI text can be externalized into translation catalogs without changing the underlying
+data structures or file formats.
+
+
+% ============================================================
+\section{Component Design}
+% ============================================================
+This section refines the logical modules from the RAD into concrete runtime components and their interfaces. CleanShare is implemented as a Qt-based Windows desktop application with a modular architecture: a Presentation layer (GUI), an Application Core that orchestrates workflow and session state, a Detection Engine (OpenCV + ONNX Runtime), a Redaction Pipeline, and an I/O \& Privacy component for file handling and guarantees of local processing.
+
+\subsection{Class/Component Diagrams}
+Figure~\ref{fig:classDiagram} shows the high-level component/class diagram for CleanShare. The main components are:
+
+\begin{itemize}
+  \item \textbf{MainWindow / Qt GUI} (Presentation): handles user interaction (open image, run detection, adjust blur regions, export image), displays the side-by-side preview, and exposes toolbar actions (undo/redo, brush/rectangle tools, blur strength).
+  \item \textbf{SessionController} (Application Core): coordinates the end-to-end workflow \emph{import $\rightarrow$ detect $\rightarrow$ blur $\rightarrow$ preview $\rightarrow$ export}. It maintains a single active \texttt{ImageSession} object with all transient state (original image, scaled working copy, detection results, masks, configuration).
+  \item \textbf{DetectionEngine} (Detection Engine): encapsulates image pre-processing, CNN inference via ONNX Runtime, optional heuristic detection, non-maximum suppression (NMS), and confidence thresholding. It returns a list of normalized bounding boxes and class scores.
+  \item \textbf{RedactionPipeline} (Redaction Pipeline): converts detection boxes and user-edited regions into a final ROI mask and applies the chosen blur strategy while preserving the original resolution.
+  \item \textbf{BlurStrategy} and concrete strategies (e.g., \texttt{GaussianBlurStrategy}, future \texttt{PixelationBlurStrategy}): plug-in components that implement the actual redaction effect for a given ROI mask.
+  \item \textbf{IOService} (I/O \& Privacy): responsible for loading/saving JPEG/PNG files, validating formats, and ensuring that all image data stays local and ephemeral.
+  \item \textbf{EvaluationRunner} (Evaluation utility, dev-only): runs the detection engine on a labeled dataset to compute recall, false positives, and timing against the success criteria; not part of the end-user GUI but included for maintainability and verification.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.99\textwidth]{High_level_Class_Diag.png}
+    \caption{High-level component/class diagram for CleanShare.}
+    \label{fig:classDiagram}
+\end{figure}
+
+
+\subsection{Component Responsibilities \& APIs}
+For each major component, we document its purpose, key responsibilities, main public methods, and important invariants.
+
+\subsubsection*{MainWindow / Qt GUI (Presentation)}
+\textbf{Purpose:} Provide an intuitive interface so a first-time user can import, blur, preview, and export an image in under 30 seconds.
+
+\textbf{Key responsibilities:}
+\begin{itemize}
+  \item Render landing page (drag-and-drop area, ``Upload'' button) and edit/view page (before/after preview, controls).
+  \item Dispatch user actions (open, detect, export, undo/redo, tool selection) to \texttt{SessionController}.
+  \item Display progress indicators and error messages (invalid file, slow inference, no detections).
+\end{itemize}
+
+\textbf{Representative API (Qt signals/slots simplified):}
+\begin{itemize}
+  \item \texttt{slot onOpenImageClicked(QString filePath);}
+  \item \texttt{slot onRunDetectionClicked();}
+  \item \texttt{slot onExportImageClicked(QString filePath);}
+  \item \texttt{slot onToolChanged(ToolMode mode);}
+  \item \texttt{slot onUndo(); \quad slot onRedo();}
+  \item \texttt{slot onBlurStrengthChanged(int value);}
+\end{itemize}
+
+\textbf{Invariants:}
+\begin{itemize}
+  \item At most one active \texttt{ImageSession} is bound to the GUI at a time.
+  \item All visible preview images correspond to the currently active session state.
+\end{itemize}
+
+\subsubsection*{SessionController (Application Core)}
+\textbf{Purpose:} Central coordinator that enforces the main use case ``Blur a photo and export'' and maintains consistent session state.
+
+\textbf{Key responsibilities:}
+\begin{itemize}
+  \item Create and own the \texttt{ImageSession} object when a new image is loaded.
+  \item Orchestrate pre-processing, detection, redaction, and export by delegating to \texttt{DetectionEngine}, \texttt{RedactionPipeline}, and \texttt{IOService}.
+  \item Manage configuration (detection threshold, blur type) and propagate changes to the relevant components.
+  \item Integrate manual edits (brush/rectangle add/remove) into the current ROI mask and manage an undo/redo stack.
+\end{itemize}
+
+\textbf{Representative API:}
+\begin{itemize}
+  \item \texttt{bool loadImage(const QString\& path);}
+  \item \texttt{bool runAutoDetection();}
+  \item \texttt{bool applyRedaction();}
+  \item \texttt{bool exportImage(const QString\& path);}
+  \item \texttt{void applyUserStroke(const Stroke\& stroke);} % add/remove manually marked regions
+  \item \texttt{void setDetectionConfig(const DetectionConfig\& cfg);}
+  \item \texttt{void setBlurStrategy(std::shared\_ptr<BlurStrategy> strategy);}
+\end{itemize}
+
+\textbf{Invariants:}
+\begin{itemize}
+  \item \texttt{ImageSession} is either in state \emph{Idle}, \emph{Loaded}, \emph{Detected}, \emph{Edited}, or \emph{Exported} (see state machine).
+  \item All detection boxes and masks stored in the session are aligned with the current working image resolution.
+\end{itemize}
+
+\subsubsection*{DetectionEngine}
+\textbf{Purpose:} Encapsulate all model-related work: image pre-processing, CNN inference (ONNX Runtime), optional heuristic detection, and post-processing.
+
+\textbf{Key responsibilities:}
+\begin{itemize}
+  \item Convert the loaded image into the model's expected input format (resize, normalize, channel order).
+  \item Run the YOLOv11-derived ONNX model on CPU and measure latency.
+  \item Apply confidence threshold and NMS to filter boxes.
+  \item Optionally merge heuristic OpenCV detections as a fallback.
+\end{itemize}
+
+\textbf{Representative API:}
+\begin{itemize}
+  \item \texttt{DetectionResult run(const Image\& input);}
+  \item \texttt{void setConfidenceThreshold(float t);}
+  \item \texttt{void setNmsThreshold(float t);}
+\end{itemize}
+
+\textbf{Invariants:}
+\begin{itemize}
+  \item Each \texttt{DetectionResult} is tied to exactly one input image and stores boxes in normalized coordinates.
+  \item The engine is stateless between calls except for configuration parameters.
+\end{itemize}
+
+\subsubsection*{RedactionPipeline}
+\textbf{Purpose:} Convert detections + user edits into a final blurred image while preserving the original resolution.
+
+\textbf{Key responsibilities:}
+\begin{itemize}
+  \item Build an ROI mask from detection boxes and user-applied strokes (add/remove regions).
+  \item Invoke the selected \texttt{BlurStrategy} to apply the blur to the ROI.
+  \item Ensure that the output image has identical dimensions and format to the original.
+\end{itemize}
+
+\textbf{Representative API:}
+\begin{itemize}
+  \item \texttt{Image apply(const Image\& original,}
+        \texttt{const DetectionResult\& detections,}
+        \texttt{const Mask\& manualEdits);}
+  \item \texttt{void setBlurStrategy(std::shared\_ptr<BlurStrategy> strategy);}
+\end{itemize}
+
+\textbf{Invariants:}
+\begin{itemize}
+  \item The redacted image always matches the original resolution.
+  \item ROI masks are binary (masked vs not masked); no pixels outside the mask are modified.
+\end{itemize}
+
+\subsubsection*{BlurStrategy and Concrete Strategies}
+\textbf{Purpose:} Separate ``what gets blurred'' (mask) from ``how it is blurred'' (effect), allowing future effects without changing the pipeline.
+
+\textbf{Key responsibilities:}
+\begin{itemize}
+  \item Provide a common interface for different blur implementations.
+  \item Implement specific algorithms (Gaussian blur now; pixelation/mosaic later).
+\end{itemize}
+
+\textbf{Representative API:}
+\begin{itemize}
+  \item \texttt{virtual Image apply(const Image\& src, const Mask\& roi) = 0;}
+\end{itemize}
+
+\textbf{Invariants:}
+\begin{itemize}
+  \item Derived strategies must not modify pixels outside the ROI mask.
+\end{itemize}
+
+\subsubsection*{IOService (I/O \& Privacy)}
+\textbf{Purpose:} Handle all disk access while respecting the ``local-only, no cloud'' constraint.
+
+\textbf{Key responsibilities:}
+\begin{itemize}
+  \item Validate file type and size (JPEG/PNG only).
+  \item Read images into the internal representation used by the application.
+  \item Write out blurred images at the original resolution and format.
+\end{itemize}
+
+\textbf{Representative API:}
+\begin{itemize}
+  \item \texttt{Image loadImage(const QString\& path) throw(InvalidFileException);}
+  \item \texttt{void saveImage(const QString\& path, const Image\& img);}
+\end{itemize}
+
+\textbf{Invariants:}
+\begin{itemize}
+  \item No images or metadata are persisted beyond the exported file the user explicitly saves.
+  \item Temporary files (if any) are deleted at the end of the session.
+\end{itemize}
+
+\subsubsection*{EvaluationRunner (Dev Utility)}
+\textbf{Purpose:} Support offline evaluation against the success criteria (recall, false positives, processing time) without modifying production code.
+
+\textbf{Key responsibilities:}
+\begin{itemize}
+  \item Load a labeled dataset of images and ground-truth boxes.
+  \item Call \texttt{DetectionEngine} and compute recall, false positives, and mAP.
+  \item Record per-image processing times.
+\end{itemize}
+
+% You can add a small table summarizing components if you want more detail/space.
+
+
+\subsection{Design Patterns}
+Several design patterns are used to keep the system modular, testable, and easy to extend:
+
+\begin{itemize}
+  \item \textbf{Model–View–Presenter (MVP) for the GUI:}
+        \begin{itemize}
+          \item \emph{View}: \texttt{MainWindow}, preview widgets.
+          \item \emph{Presenter/Controller}: \texttt{SessionController} translates user actions into operations on the model.
+          \item \emph{Model}: \texttt{ImageSession} and underlying components (DetectionEngine, RedactionPipeline).
+        \end{itemize}
+        This keeps GUI code thin and localizes workflow logic in the core.
+
+  \item \textbf{Strategy for blur effects:}
+        \begin{itemize}
+          \item Abstract \texttt{BlurStrategy} defines the interface.
+          \item Concrete classes (e.g., \texttt{GaussianBlurStrategy}, future \texttt{PixelationBlurStrategy}) implement different visual effects.
+          \item The pipeline chooses a strategy at runtime based on user settings, enabling future extensions without changing callers.
+        \end{itemize}
+
+  \item \textbf{Strategy for detection backends (optional extension):}
+        \begin{itemize}
+          \item Interface \texttt{IDetectionEngine} with implementations such as \texttt{OnnxDetectionEngine} and \texttt{HeuristicDetectionEngine}.
+          \item Allows switching between pure CNN inference and a lighter heuristic mode if performance or model availability changes.
+        \end{itemize}
+
+  \item \textbf{Adapter / Facade for ONNX Runtime:}
+        \begin{itemize}
+          \item A thin wrapper (e.g., \texttt{OnnxRuntimeAdapter}) hides the low-level ONNX API and exposes a simple \texttt{run(Image)} call.
+          \item This isolates external library details and simplifies testing and replacement of the model.
+        \end{itemize}
+
+  \item \textbf{Command for undo/redo:}
+        \begin{itemize}
+          \item Each manual operation (brush add, brush erase, rectangle add/remove) is represented as a command (\texttt{ApplyStrokeCommand}, \texttt{EraseRegionCommand}).
+          \item Commands know how to \texttt{execute()} and \texttt{undo()}, enabling robust undo/redo as required by the UX constraints.
+        \end{itemize}
+\end{itemize}
+
+
+% ============================================================
+\section{Dynamic Behavior}
+% ============================================================
+This section describes how the components collaborate at runtime. The focus is on the main use case ``Blur a photo and export'' and on the internal state transitions of the image session, tool selection, and inference jobs.
+
+\subsection{Sequence Diagrams}
+Figure~\ref{fig:seqMainFlow} shows the sequence diagram for the primary flow ``Blur a photo and export''. The main lifelines are \emph{User}, \emph{MainWindow}, \emph{SessionController}, \emph{IOService}, \emph{DetectionEngine}, \emph{RedactionPipeline}, and \emph{FileSystem}.
+
+The typical interaction is:
+
+\begin{enumerate}
+  \item \textbf{Import:} The User selects an image file. \texttt{MainWindow} calls \texttt{SessionController::loadImage()}, which delegates to \texttt{IOService::loadImage()}. On success, a new \texttt{ImageSession} is created in state \emph{Loaded} and the original image is shown in the ``before'' pane.
+  \item \textbf{Detect:} The User clicks ``Auto Detect \& Blur''. \texttt{MainWindow} calls \texttt{SessionController::runAutoDetection()}, which invokes \texttt{DetectionEngine::run()} on the current image. Detection results are stored in the session and the state moves to \emph{Detected}.
+  \item \textbf{Redact:} \texttt{SessionController} immediately calls \texttt{RedactionPipeline::apply()} with the original image, detection results, and any existing manual mask. The selected \texttt{BlurStrategy} is applied, producing the blurred image. The session state becomes \emph{Edited}.
+  \item \textbf{Preview \& Adjust:} The blurred image is shown in the ``after'' pane. If the User uses the brush/rectangle tools, \texttt{MainWindow} reports strokes to \texttt{SessionController::applyUserStroke()}, which updates the mask, re-runs the pipeline, and pushes commands onto the undo stack.
+  \item \textbf{Export:} When satisfied, the User clicks ``Export''. \texttt{MainWindow} calls \texttt{SessionController::exportImage()}, which calls \texttt{IOService::saveImage()} with the current blurred image. On success, the session may move to state \emph{Exported}.
+\end{enumerate}
+
+Alternate flows (e.g., invalid file, no detections, inference error) follow the same structure but include error messages and, for ``no detections'', skip the detection results while still allowing manual marking.
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.99\textwidth]{SequenceDiagramMainFlow.png}
+\caption{\centering Main flow for importing, detecting, blurring, previewing, and exporting an image.}
+\label{fig:seqMainFlow}
+\end{figure}
+
+% (Optional) You may add a second sequence diagram for manual edits only if you need more detail/space.
+
+\subsection{State Machines}
+CleanShare has several important stateful behaviours. We model them with state machines to clarify legal transitions and simplify error handling.
+
+\subsubsection*{ImageSession Lifecycle}
+The \texttt{ImageSession} object tracks the end-to-end state of the current image:
+
+\begin{itemize}
+  \item \textbf{Idle:} No image loaded yet (initial state after app launch or after closing a session).
+  \item \textbf{Loaded:} A valid image has been loaded; no detections have been run.
+  \item \textbf{Detected:} Automatic detection has completed successfully; detection results are stored.
+  \item \textbf{Edited:} At least one redaction pass has been applied (automatic or manual). Manual brush/rectangle operations keep the session in this state while updating the mask.
+  \item \textbf{Exported:} The current blurred image has been successfully saved to disk for this session.
+  \item \textbf{Error} (transient): An error occurred (invalid file, inference failure); the controller reports the error and typically resets the session to \emph{Idle} or \emph{Loaded} depending on the scenario.
+\end{itemize}
+
+Typical transitions:
+\begin{itemize}
+  \item \emph{Idle} $\xrightarrow{\texttt{loadImage}}$ \emph{Loaded}
+  \item \emph{Loaded} $\xrightarrow{\texttt{runAutoDetection}}$ \emph{Detected}
+  \item \emph{Detected} $\xrightarrow{\texttt{applyRedaction}}$ \emph{Edited}
+  \item \emph{Edited} $\xrightarrow{\texttt{exportImage}}$ \emph{Exported}
+  \item Any non-\emph{Idle} state $\xrightarrow{\texttt{closeSession}}$ \emph{Idle}
+  \item Any state $\xrightarrow{\texttt{error}}$ \emph{Error} $\rightarrow$ recovery (\emph{Idle} or \emph{Loaded})
+\end{itemize}
+
+\subsubsection*{Tool Mode (Manual Editing)}
+A separate state machine models the current tool mode for manual blur region editing:
+
+\begin{itemize}
+  \item \textbf{NoneSelected}: No manual tool is active (default).
+  \item \textbf{BrushAdd}: Painting over regions to add them to the blur mask.
+  \item \textbf{BrushErase}: Painting to remove regions from the blur mask.
+  \item \textbf{RectAdd}: Drawing rectangles to add regions to the blur mask.
+  \item \textbf{RectErase}: Drawing rectangles to remove regions from the blur mask.
+\end{itemize}
+
+Transitions are triggered by toolbar button clicks:
+\begin{itemize}
+  \item \emph{NoneSelected} $\xrightarrow{\texttt{selectBrushAdd}}$ \emph{BrushAdd}, etc.
+  \item Selecting an already-active tool either keeps the state or returns to \emph{NoneSelected} (toggle behaviour).
+  \item Selecting a different tool transitions directly between tool states (e.g., \emph{BrushAdd} $\xrightarrow{\texttt{selectRectErase}}$ \emph{RectErase}).
+\end{itemize}
+
+\subsubsection*{Inference Job State}
+Finally, the detection process itself is modelled as a simple job state machine:
+
+\begin{itemize}
+  \item \textbf{Idle}: No inference is in progress.
+  \item \textbf{Running}: The ONNX model is currently executing on the image.
+  \item \textbf{CancelRequested}: The user has requested cancellation (if supported); the engine should stop at the next safe opportunity.
+  \item \textbf{Completed}: Inference finished successfully and results were delivered to the session.
+  \item \textbf{Failed}: An error occurred (e.g., missing weights, invalid model); an error message is shown.
+\end{itemize}
+
+Transitions:
+\begin{itemize}
+  \item \emph{Idle} $\xrightarrow{\texttt{run}}$ \emph{Running}
+  \item \emph{Running} $\xrightarrow{\texttt{cancel}}$ \emph{CancelRequested} $\rightarrow$ \emph{Idle}
+  \item \emph{Running} $\xrightarrow{\texttt{success}}$ \emph{Completed} $\rightarrow$ \emph{Idle}
+  \item \emph{Running} $\xrightarrow{\texttt{error}}$ \emph{Failed} $\rightarrow$ \emph{Idle}
+\end{itemize}
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.99\textwidth]{StateDiagram.png}
+\caption{Statecharts for the image session, tool mode selection, and inference job.}
+\label{fig:statecharts}
+\end{figure}
+% ============================================================
+\section{Error Handling, Logging, and Telemetry}
+% ============================================================
+\subsection{Error Classes and Recovery}
+CleanShare operates entirely locally, with all processing executed on the user’s machine. Error handling follows a strict fail-fast model: any invalid input or failed detection step is surfaced immediately to the user with a deterministic recovery path. Errors are categorized into four classes: input errors (unsupported or corrupted image types), processing errors (OpenCV preprocessing or ONNX inference faults), export errors (disk write failures), and UI errors (invalid user actions in manual editing mode). Input errors terminate the pipeline before preprocessing begins. Processing errors trigger an internal safe-state rollback, clearing intermediate buffers and reverting the UI to the import state. Long-running detections that exceed a configured timeout or encounter out-of-memory (OOM) conditions are treated as processing errors: the operation is aborted, the user is notified, and the session is rolled back to a known-good state. User-facing messages are concise, actionable, and tied to a clear next step (e.g., “Unsupported file format – please select a PNG or JPEG image” or “Detection failed – you can continue in manual blur mode”). Export errors preserve the in-memory processed image and prompt user re-selection of output path. UI errors reset only the active tool state, ensuring manual controls never corrupt session data. When automatic detection is unavailable or fails repeatedly, the system degrades gracefully to a “manual-only” fallback mode where users can still draw and adjust blur regions and safely export the result.
+
+
+
+\subsection{Logging}
+Logging is strictly local and minimal by design. A rotating text-based log tracks operational events: image load, preprocessing start, inference start and duration, blur operations, failed detections, and export completion. Log entries are tagged with standard levels (INFO for normal operations, WARNING for recoverable issues, and ERROR for failures that trigger rollback) so that developers and advanced users can filter noise when debugging. Sensitive data—including pixel arrays, bounding boxes, or user images—is never written to disk or transmitted externally. Telemetry is deliberately excluded: the system collects no analytics, no model-usage statistics, and no user identifiers. Timing data used for performance debugging is computed in-memory and discarded when the application closes. No log entry persists beyond the local session unless the user manually chooses to retain diagnostic output.
+
+% ============================================================
+\section{Security \& Privacy Design}
+% ============================================================
+\subsection{Privacy Principles}
+
+The system’s security posture follows a privacy-first model consistent with the RAD: all computations execute offline, no data is transmitted, and no external services are invoked. Information disclosure is mitigated by avoiding temporary disk writes entirely; image buffers and CNN outputs remain in volatile memory. No persistence layer exists beyond the user-requested export, and the system deletes all intermediate arrays immediately after export or cancellation. The architecture prohibits cloud fallback; any network request from the application is categorically disabled. This design ensures compliance with institutional privacy expectations described in the RAD.
+
+
+\subsection{Threat Model (STRIDE-lite)}
+
+The threat model is scoped to a workstation-local environment using a STRIDE-lite analysis. Spoofing is irrelevant because no authentication or accounts exist. Tampering concerns arise only in filesystem interactions; the application validates image metadata and dimensions before use, rejecting malformed or oversized files. Repudiation risks are null because the application stores no user actions or long-term logs. Denial of service threats are restricted to pathological inputs (extremely large images or malformed files), managed by hard caps on resolution and memory allocation. Elevation of privilege is out of scope due to the absence of privileged operations or plugins. The primary assets considered in this model are user-supplied images, redacted outputs, the on-disk detection model, and any in-memory intermediate representations (feature maps, masks, and configuration values). Trust boundaries are defined between the user and the desktop OS, between the OS and the CleanShare process, and internally between the Qt UI, application core, and detection/redaction subsystems; untrusted input is validated before crossing each boundary. Model integrity is protected by validating the ONNX model artifact at startup (for example, checking its expected path, size, and version tag) and refusing to execute inference if the file appears missing, corrupted, or tampered.
+
+\subsection{Access Control}
+
+Access control is simplified: the sole user has implicit full execution rights, but the application enforces internal boundaries between UI, application core, and detection pipeline. The detection engine and redaction pipeline never expose raw model output externally. File system access is further constrained by the underlying operating system; CleanShare relies on standard OS-level file permissions (and any platform sandboxing) to determine which images can be opened or written and does not attempt to bypass these controls.
+
+
+% ============================================================
+\section{Performance, Capacity, and Quality Attributes}
+% ============================================================
+
+\subsection{Targets and Budgets}
+
+CleanShare’s performance and quality targets are derived directly from the RAD and are treated as hard
+engineering constraints rather than best-effort goals:
+
+\begin{itemize}
+  \item $\leq$10 s per 1080p image (CPU baseline) on a typical Windows 10+ laptop with $\geq$8~GB RAM.
+  \item $\geq$80\% recall on held-out validation images, with a low false positive rate (target $\leq$15\%).
+  \item GUI responsiveness $\leq$300 ms for user actions (button presses, tool changes, slider moves).
+  \item First-time user can complete the core workflow (import $\rightarrow$ detect $\rightarrow$ blur $\rightarrow$ export) in $\leq$30 s.
+\end{itemize}
+
+These targets are measured using a repeatable evaluation setup rather than ad hoc “feel tests”:
+
+\begin{itemize}
+  \item \textbf{Hardware test rig.} A representative “baseline” machine is defined as a Windows 10+ laptop with a mid-range CPU (for example, a 4-core Intel i5 or Ryzen 5), 8~GB RAM, and no discrete GPU. All timing numbers and capacity claims in this document assume this baseline; GPU acceleration is treated as a bonus, not a requirement.
+  \item \textbf{Workload.} For performance tests, a fixed corpus of 1080p images is used. This corpus is drawn from the held-out Liquor Data subset plus additional distractor images (non-alcoholic scenes, soda cans, cluttered backgrounds) as described in the RAD’s validation section. Each candidate build processes the entire corpus end-to-end (import $\rightarrow$ detect $\rightarrow$ blur $\rightarrow$ export).
+  \item \textbf{Metrics and collection.} The EvaluationRunner (Sec.~6.2) records per-image:
+    \begin{itemize}
+      \item Detection metrics (recall, precision, false positive rate, mAP@0.5) against ground truth labels.
+      \item End-to-end processing time, split into pre-processing, inference, redaction, and export.
+      \item Peak resident memory for the process (where available from OS tooling).
+    \end{itemize}
+    For runtime, both median and 95th-percentile latencies must be below the 10~s target for 1080p images (Sec.~13.2).
+  \item \textbf{Pass/fail criteria.} A build fails the performance/quality gate if any of the following hold:
+    \begin{itemize}
+      \item Dataset recall $< 80\%$ or false positive rate $> 15\%$.
+      \item Median 1080p processing time $> 10$~s on the baseline rig.
+      \item GUI latency for simple actions (opening dialogs, toggling tools, updating sliders) exceeds 300 ms in UX smoke tests.
+    \end{itemize}
+    These thresholds match the acceptance criteria in Sec.~13.3 and the RAD’s non-functional requirements.
+\end{itemize}
+
+This approach ensures that performance and detection quality are continuously verified in an automated,
+dataset-backed way rather than only during manual demos.
+
+\subsection{Scalability Considerations}
+
+CleanShare is a single-user, single-desktop application. “Scalability” therefore focuses on how gracefully the
+system handles larger images, heavier workloads, and potential future batch mode, rather than multi-user
+throughput.
+
+\paragraph{Image size and memory bounds.}
+\begin{itemize}
+  \item \textbf{Supported resolutions.} The design targets 1080p as the baseline and supports higher resolutions (e.g., 1440p, 4K) subject to available RAM. All internal masks and redacted images are kept at the original resolution to preserve export fidelity (Sec.~5.1).
+  \item \textbf{Pre-processing strategy.} The DetectionEngine resizes a working copy of the image to the model’s fixed input size (e.g., $640 \times 640$) and stores detections in normalized coordinates. This keeps model inference cost approximately constant per image, regardless of original resolution; only pre/post-processing time scales with pixel count.
+  \item \textbf{Hard caps.} To avoid pathological inputs causing out-of-memory conditions, the IOService enforces a maximum allowable resolution (for example, rejecting images above a configured megapixel limit or prompting the user to downscale). Extremely large images are either rejected with a clear error or automatically downsampled for processing while maintaining correct mapping back to original coordinates for masks and overlays.
+\end{itemize}
+
+\paragraph{Runtime behaviour under heavier workloads.}
+\begin{itemize}
+  \item \textbf{Single-image pipeline.} For the current release, the application processes one image at a time on a single worker thread (Sec.~3.2). This guarantees that CPU and memory use remain bounded and predictable.
+  \item \textbf{Batch mode (future extension).} The optional future batch feature (Sec.~3.5, UC-3) is designed as a thin loop over the existing single-image pipeline. Images are processed sequentially, reusing the same DetectionEngine and RedactionPipeline instances to avoid repeated model loading. This provides coarse-grained scalability to folders of images without changing the core complexity or memory footprint per image.
+  \item \textbf{Complexity.} The dominant costs scale approximately linearly with the number of pixels in the working image for OpenCV operations (blur, mask composition) and with the number of detections for NMS. Since YOLO-style detectors typically produce a bounded number of high-confidence boxes per class, NMS overhead remains small even on busy scenes.
+\end{itemize}
+
+\paragraph{Capacity and degradation.}
+\begin{itemize}
+  \item \textbf{Graceful degradation.} If memory allocation for an operation fails (for example, attempting to allocate a blur kernel for an oversized image), the system aborts the current operation, surfaces an error, and encourages the user to use a smaller image. The session is rolled back to a safe state (Sec.~8.1).
+  \item \textbf{No background queue.} CleanShare does not maintain a long-running job queue or background tasks beyond the active worker thread; this avoids hidden memory growth over time. Capacity concerns are therefore limited to “one large image at a time” plus minor GUI overhead.
+\end{itemize}
+
+Overall, the design ensures that CleanShare scales predictably from modest laptop hardware up to more
+powerful desktops, with clear boundaries on what image sizes are supported and how future batch features
+will reuse the same core pipeline.
+
+\subsection{Usability \& Accessibility}
+
+Usability and accessibility are treated as explicit quality attributes and are aligned with the RAD’s UX
+requirements (Sec.~9.2) and the primary use-case scenarios (Sec.~3.5):
+
+\paragraph{Interaction model and responsiveness.}
+\begin{itemize}
+  \item \textbf{Simple primary workflow.} The main workflow is linear and visible: “Import image”, “Auto Detect \& Blur”, optional manual adjustments, and “Export”. Each step is reachable from the main window with at most one click, satisfying the “all major operations in $\leq 3$ actions” requirement.
+  \item \textbf{Non-blocking UI.} All long-running work (model inference, full-resolution redaction) runs on a background worker thread; the Qt GUI thread remains free to repaint and respond to input (Sec.~3.2). While a job is running, the user sees a progress indicator and can cancel if needed, keeping perceived responsiveness under the 300~ms target for all simple interactions.
+  \item \textbf{Undo/redo safety.} Manual edits (brush/rectangle) are implemented via a Command-based undo stack (Sec.~6.3). Commands only manipulate masks and never touch the original pixels, ensuring that undo/redo is fast, predictable, and cannot corrupt the base image.
+\end{itemize}
+
+\paragraph{Discoverability and error feedback.}
+\begin{itemize}
+  \item \textbf{High-contrast, labeled controls.} Buttons and tool icons use clear text labels or tooltips (e.g., “Import image”, “Auto Detect \& Blur”, “Export”) and are placed in consistent locations across states (landing vs. edit view), matching the RAD’s requirement for labeled controls and high-contrast actionable buttons.
+  \item \textbf{Inline error messages.} All errors (unsupported file types, failed inference, no detections) are surfaced as inline banners or dialogs near the relevant UI element, with actionable wording (“Unsupported file format – please select a PNG or JPEG image”). The user is never stranded in an ambiguous state; each error path leads back to a stable screen (Sec.~8.1).
+  \item \textbf{Tool states.} The current manual tool (none/brush/rectangle, add/erase) is always visible via a highlighted toolbar button. This reduces mode confusion and makes it easy for users to understand what their next click will do.
+\end{itemize}
+
+\paragraph{Accessibility considerations.}
+\begin{itemize}
+  \item \textbf{Keyboard support.} Core commands (open, run detection, export, undo/redo, tool switching) are reachable via standard keyboard shortcuts and tab-based focus navigation, so users who cannot rely exclusively on a mouse can still operate the main workflow.
+  \item \textbf{Visual clarity.} The preview panes maintain a minimum size and support synchronized zooming/panning, ensuring that blurred regions are easy to inspect. Guided defaults (e.g., a sensible initial zoom level and blur strength) are chosen to reduce cognitive load for first-time users.
+  \item \textbf{Out-of-scope aspects.} Full screen-reader support and advanced accessibility features (for example, ARIA roles, high-contrast OS themes integration) are not explicitly implemented for this course deliverable, but the UI layout and use of standard Qt widgets keep the path open for future accessibility improvements.
+\end{itemize}
+
+Combined, these usability and accessibility decisions support the non-functional goal that a new user can
+successfully blur and export a photo quickly, with clear feedback, minimal confusion, and low risk of making
+irreversible mistakes.
+
+
+% ============================================================
+\section{Deployment \& Installation}
+% ============================================================
+\subsection{Packaging}
+
+CleanShare is distributed as a standalone Windows application, packaged with all required runtime dependencies - ensuring that there are no external installation steps beyond the main executable. The delivered distribution folder contains the Qt GUI assets, ONNX model weights which were trained from the YOLOv11 fine-tuned Liquor Data dataset, and all OpenCV libraries required for preprocessing and blurring. Users can launch the program directly by opening the primary executable.The distribution also bundles the ONNX Runtime shared libraries (for example, \texttt{onnxruntime.dll}) required for local model inference, so no separate machine-learning runtime installation is needed.
+
+To maintain a simple and offline installation process, the application does not use an installer. The application is provided as  a compressed folder that the user extracts and runs directly on their computer. This approach avoids the need for admin permissions, keeps all system files self contained, and ensures compatibility across Windows systems without ever modifying the host environment. All processing stays local, and the application only creates new files when the user exports a processed image.
+The extracted folder follows a simple layout (for example: CleanShare.exe in the root, a models/ directory for ONNX files, a qt\_assets/ directory for UI resources, a config/ or settings file, and the required DLLs in the same tree), so deploying to a new machine is equivalent to copying or unpacking this single directory without any additional installation steps.
+
+\subsection{Runtime Configuration}
+
+CleanShare maintains the system's lightweight and ease of use across various machines by supporting a minimal runtime configuration model. A configuration file in the application folder contains basic user settings such as blur strength, confidence threshold, and whether or not the previews are displayed at lower resolution for performance. Although this file can be altered if necessary, the default settings are adequate for everyday use and call for extra user input. 
+The configuration file (for example, config.json or settings.ini in the application root) is the single source of truth for runtime options, and no environment variables or global OS settings are read or required by CleanShare. In practice, the default configuration is intended to work out of the box for typical workflows without requiring any additional user input or tuning from the user.
+
+After the user-initiated export step, no user data or intermediate images are saved; all processing takes place locally. By maintaining the original image resolution when exporting, the application maintains a consistent output format. CleanShare is self-contained, simple to reset, and easy to use on any Windows supported system.
+If the configuration file becomes corrupted or is deleted, CleanShare can regenerate it with the default values on the next launch, allowing users to quickly restore a known-good baseline configuration.
+
+
+% ============================================================
+\section{Build, CI/CD, and Configuration Management}
+% ============================================================
+\subsection{Build Tooling}
+
+CleanShare is built using C++17 with CMake as the main build system. CMake manages the compiler configuration, dependency resolution, and the integration with Qt~\cite{QtDocs}, OpenCV~\cite{OpenCV}, and ONNX Runtime~\cite{ONNXRuntime}. This ensures that the builds are consistent across different development environments and avoids manual dependency configuration on each machine. The project includes separate debug and release build profiles - Debug contains additional loggina and insertions to support development, while Release applies full optimization for faster image processing and model inference. All third party libraries required for runtime execution are bundled in the build process to produce an all encompassing output folder.
+
+Typical compiler flags include explicitly enabling the C++17 standard, turning on high optimization for Release builds (for example /O2 or -O2) and strict warning levels (such as /W4 or -Wall -Wextra), with warnings treated as errors in the CI environment to prevent unsafe or non-portable changes from entering the main branch.
+
+
+
+
+\subsection{CI Pipeline}
+A continuous integration pipeline, implemented using GitHub Actions, is used to maintain the code quality and ensure that any new changes to the code do not produce any errors. Upon any pull or push to the repository, the pipeline will execute on these following stages:
+\begin{itemize}
+    \item \textbf{Build:} Configure and compile the project using CMake to verify that the codebase builds cleanly.
+    \item \textbf{Static Analysis:} Run tools such as clang-tidy and cppcheck to detect potential issues early on the run.
+    \item \textbf{Unit Tests:} Execute automated tests covering each step of the interactions, image preprocessing, ROI generation, and blur operations.
+    \item \textbf{Model Evaluation:} Validate the ONNX model against a small test subset to verify detection accuracy and output format consistency
+    \item \textbf{Packaging:} For the main branch, generate a Release build and bundle the executable, file model, and dependencies into a folder for distribution. 
+\end{itemize}
+
+
+The pipeline prevents merging code that fails to build or violates quality constraints, making sure that the project stays stable, predictable, and deployable during development. 
+For successful builds on the main branch, the pipeline also tags releases in version control (for example v1.2.0) and attaches the packaged artifacts to that tag, and can optionally run a code-signing step using an organization certificate so that downloaded binaries can be traced back to a specific, authenticated source revision.
+
+
+\subsection{Semantic Versioning \& Model Versioning}
+CleanShare follows a semantic versioning structure for its releases, with each release being labeled as  \begin{verbatim}
+    MAJOR.MINOR.PATCH
+\end{verbatim} A change in the MAJOR version indicates a significant architectural change, MINOR updates introduce new features, and PATCH additions apply bug fixes or minor improvements.
+
+The ONNX model used for the detection is versioned separately from the application. Model files include both a semantic version number and a unique hash to guarantee reproducibility (e.g. liquor-model-v.1-hash.onnx). When the model is updated, the CI pipeline evaluates the new version against a small valid dataset to make sure accuracy and performance stay within the expected bounds before release.
+
+A simple compatibility scheme is maintained (for example, all 1.x application versions are guaranteed to work with any 1.y model version, while a 2.x application may require a 2.y or newer model), and incompatible app–model pairings are detected at startup so that the user receives a clear error instead of undefined behaviour.
+
+\subsection{Configuration Management}
+All configuration files; model file, default settings, and build scripts, are stored in version control. Changes to configuration are reviewed along with code to maintain consistency across versions. The application does not require system level configuration and does not modify registry values or program files outside of its own directory. Doing this allows for a self contained system which is reproducible and easy to deploy.
+
+Configuration and build changes are also summarized in a changelog or VERSION file so that each deployment can quickly determine which configuration, model and build scripts correspond to a particular tagged release.
+
+
+% ============================================================
+\section{Verification \& Validation Strategy}
+% ============================================================
+\subsection{Test Levels}
+CleanShare use a structured, multi-level testing approach to account for correctness, stability, and predictable behavior spanning all parts of the system. The testing is divided into the following levels:
+\begin{itemize}
+    \item Unit Testing
+
+Unit tests validate the behaviour of individual components such as image loading, preprocessing, ROI mask construction, blur application, and basic I/O file operations. These tests confirm that core algorithms behave consistently, handle edge cases, and do not introduce regressions when the codebase changes.
+
+    \item Integration Testing
+
+Integration tests confirm that the main subsystems function as intended. This covers the communication between the redaction pipeline, the ONNX detection model, the application core, and the Qt GUI. Tests verify that blur regions are applied to the expected coordinates, that detection results are accurately mapped back to the original image dimensions, and that the transition from detection $\rightarrow$ preview $\rightarrow$ export is dependable.
+
+    \item System Testing
+
+System Testing System-level tests use full workflows, including loading an image, inferring, applying blur, previewing, and exporting the finished product, to assess CleanShare end-to-end. Consistency, usability, response times, and appropriately handling no-detection scenarios are the main objectives of these tests. All user-initiated blur regions must be preserved, and the output must always match the original resolution.
+
+
+    \item Regression Testing
+
+Regression tests compare outputs to earlier iterations of the detection model or new features. This guarantees that updates won't alter current behaviour, decrease accuracy, or create unanticipated visual artifacts. A consistent collection of sample photos from the repository is used for regression testing.
+
+    
+\end{itemize}
+
+Dedicated performance tests run representative 1080p and higher-resolution images to measure end-to-end processing time and memory usage, ensuring that newly introduced code paths do not violate latency or resource targets. Lightweight UX smoke tests are also executed on fresh builds to quickly exercise the main user flows (open, detect, adjust, export) and confirm that the interface remains responsive, discoverable, and free of obvious usability regressions.
+
+
+\subsection{Dataset-Based Evaluation}
+Because CleanShare relies on an ONNX model trained on the Liquor Data dataset ~\cite{LiquorData}, a portion of that data set is used for validation and performance verification. The subset consists of a mix of various beers, wine, and spirit containers, along with some non-alcoholic distractor objects. 
+
+Evaluation metrics:
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{l p{8cm} l}
+        \hline
+        \textbf{Metric} & \textbf{Description} & \textbf{Target} \\
+        \hline
+        Recall & Measures how many alcohol containers are detected correctly. & $\geq 80\%$ \\
+        False Positive Rate & Ensures the system does not incorrectly blur non-alcoholic objects. & $\leq 15\%$ \\
+        mAP@0.5 & Validates overall detection quality across the validation set. & Stable across model updates \\
+        Processing Time & Measures time to detect and blur a 1080p image on a typical Windows machine. & $\leq 10\ \text{s}$ \\
+        \hline
+    \end{tabular}
+    \caption{CleanShare detection and performance evaluation metrics.}
+    \label{tab:CleanShare-metrics}
+\end{table}
+
+These evaluations help ensure that updates to the detection model maintain consistent accuracy and speed across releases. The CI pipeline automatically runs a small subset of these checks when a new version is proposed.
+	
+Precision is also monitored alongside recall so that the model maintains a good balance between correctly detecting alcohol containers and avoiding unnecessary blurring of non-alcoholic objects. Evaluation results and metric trends are exported as machine-readable reports (for example JSON or CSV artifacts produced by the CI pipeline), allowing regressions to be detected, audited, and compared across multiple model and application versions.
+
+
+\subsection{Acceptance Criteria}
+
+CleanShare is ready for release when the following conditions are met:
+
+\begin{description}
+  \item[Accuracy Requirements:]
+  The detection model constantly meets or exceeds the required performance metrics on the validation subset.
+
+  \item[Runtime Requirements:]
+  A standard 1080p image can be processed within 10 seconds on a typical Windows machine without GPU acceleration.
+
+  \item[Functional Stability:]
+  The complete workflow (import, detect, blur, preview, and export) must operate without crashes, visual corruption, or loss of user-selected regions.
+
+  \item[Local Processing Guarantee:]
+  No user data is transmitted, logged externally, or written to disk except for explicit exports.
+
+  \item[Output Fidelity:]
+  Exported images must have the same quality as the original pre-processed image, and maintain all blur regions as displayed in the preview.
+
+  \item[Error Handling:]
+  Invalid file types, missing dependencies, and failed detection runs must be handled gracefully, with clear user feedback.
+\end{description}
+
+Meeting these criteria ensures that CleanShare is stable, accurate, and aligned with its intended purpose of providing a reliable offline image blurring tool. A candidate build fails acceptance if any quantitative thresholds are not satisfied (for example, recall dropping below 80\%, false positive rate exceeding 15\%, or median 1080p processing time exceeding 10 seconds) or if qualitative UX goals are violated by frequent crashes, corrupted previews, or unclear error messages, giving a clear pass/fail basis for promoting a build to release.
+
+
+% ============================================================
+\section{Design Rationale and Architectural Decisions (ADRs)}
+% ============================================================
+CleanShare is a reliable, privacy tool that automatically detects and blurs alcoholic beverages in images. The application must be able to run offline, be easy to use for non technical users, and still achieve strong detection accuracy, every major part of the design was driven by these constraints. 
+
+In order to be able to run the tool offline we decided to develop a local desktop application, All image processing and machine learning is done locally, completely avoid the use of external services like APIs or remote databases. This ensures the tool functions fully on its own and meets the requirement for offline operation.
+
+To keep the system easy to use for non technical users, we made a straight forward workflow where the user imports an image, runs the detection model, makes any optional adjustments, and exports the final blurred version. The Qt interface provides clear buttons and a simple layout, which supports the ease of use requirement.
+
+For the detection system, we decided to use a CNN-based model, because alcoholic beverages vary in shape, size, and lighting. A CNN model is able to generalize across these variations and produce better and more accurate detections than rule-based image processing. The model is ran through ONNX to keep inference efficient and work well with our desktop application.
+
+
+Finally, Gaussian blur is used for redaction, fulfilling the requirement to clearly obscure detected alcohol while keeping the rest of the image intact. Key architectural choices were evaluated against alternatives: for example, Qt Widgets was selected over QML or a web or browser-based UI to reduce runtime dependencies and simplify offline deployment on standard Windows desktops, and ONNX Runtime was chosen instead of a heavier framework backend to keep inference fast and portable across machines. Gaussian blur was preferred to pixelation or solid blocking because it strongly obscures labels while preserving overall scene context and remains inexpensive to compute on CPU-only systems.
+
+
+% ============================================================
+\section{Risks and Mitigations}
+% ============================================================
+The development of CleanShare includes a few technical risks, that we must be aware of. 
+\begin{enumerate}
+    \item Low detection accuracy
+
+    Because alcoholic beverages appear in many different shapes, sizes, or lighting conditions, the model may miss some bottles or cans. To avoid this we use a CNN-based model with proper post processing and allow users to manually adjust blur regions to fix missed detections.
+    
+    \item False positives
+
+    The machine learning model may occasionally detect objects that resemble alcohol bottles or cans, leading to unnecessary blurring. To fix this we will work on our model accuracy and also provide a way for users to remove or adjust blur areas.
+    
+    \item Unsupported or invalid image formats
+
+    Users may upload images that the system does not support. Currently, we only plan to allow standard formats like JPEG and PNG, so uploading other file types may lead to errors. To work around this, our application will validate the file type and size during import and display a clear message if the image cannot be processed. This prevents the system from failing and guides the user toward supported formats.
+    
+\end{enumerate}
+
+Additional project risks include dataset bias in the Liquor Data training set (for example, over-representation of certain container types or lighting conditions), schedule slippage, and third-party library incompatibilities between Qt, OpenCV, ONNX Runtime, and Windows updates. These are mitigated by augmenting and periodically re-evaluating the dataset, prioritizing a minimal end-to-end workflow in early milestones, pinning library versions in CMake, and validating the build on a small matrix of target Windows configurations in CI.
+
+
+% ============================================================
+\section{Maintenance \& Support}
+% ============================================================
+The system is designed to be easy to maintain, update, and support throughout its lifecycle. To ensure this, the application is setup into separate modules, each with a clear responsibility. This makes it easier for us to change one part of the system without affecting the others to much. We also plan to add test cases for core functionalities that way we can easily verify if a change or an update breaks edge cases, or even the system. These test cases will cover important areas such as image importing, model loading, detection output, blur application, and exporting. By keeping the project modular and supported by testing, we will be able to identify issues quickly and make targeted fixes without needing to rework the entire application. Ongoing maintenance follows a lightweight process: issues are reported and triaged in the project repository using labelled templates for bug reports and feature requests, and fixes are batched into minor releases on a roughly monthly cadence, with critical regressions shipped as ad hoc patch releases when needed. Documentation ownership is assigned by subsystem (GUI, application core, detection engine, redaction pipeline), and the responsible maintainer ensures that user guides, developer notes, and model/versioning documentation stay in sync with each tagged release.
+
+% ============================================================
+\section{Requirements-to-Design Traceability}
+% ============================================================
+
+\begin{longtable}{|p{0.18\linewidth}|p{0.32\linewidth}|p{0.42\linewidth}|}
+\hline
+\textbf{Req ID} & \textbf{Requirement (short)} & \textbf{Satisfied by (Design element/section)}\\ \hline
+
+FR-01 & Detect and blur alcoholic beverages automatically &
+\begin{itemize}
+  \item Detection Engine \& Redaction Pipeline
+  \item Sec.~2.2 (System Decomposition)
+  \item Sec.~3.1 (Logical View)
+  \item Sec.~6.2 (Component Responsibilities \& APIs)
+  \item Sec.~7.1 (Sequence Diagrams)
+\end{itemize}
+\\ \hline
+
+FR-02 & Side-by-side before/after preview &
+\begin{itemize}
+  \item Qt GUI / MainWindow (Presentation layer)
+  \item Sec.~2.2 (Presentation Layer)
+  \item Sec.~3.1.1 (Modules and Responsibilities)
+  \item Sec.~4.1 (User Interface)
+  \item Sec.~6.2 (MainWindow / Qt GUI)
+  \item Sec.~7.1 (Main flow sequence)
+\end{itemize}
+\\ \hline
+
+FR-03 & Manual edit tools (brush/rectangle, undo/redo) &
+\begin{itemize}
+  \item Qt GUI + SessionController + RedactionPipeline
+  \item Sec.~2.2 (Presentation \& Application Core)
+  \item Sec.~3.1.1 (Qt GUI, Application Core, Redaction Pipeline)
+  \item Sec.~3.5 (UC-2: Manually edit ROIs)
+  \item Sec.~6.2 (SessionController, RedactionPipeline)
+  \item Sec.~6.3 (Command pattern for undo/redo)
+  \item Sec.~7.2 (Tool Mode state machine)
+\end{itemize}
+\\ \hline
+
+FR-04 & Upload images in JPEG/PNG formats &
+\begin{itemize}
+  \item I/O \& Privacy module / IOService
+  \item Sec.~2.2 (I/O \& Utils)
+  \item Sec.~4.2 (File Interfaces)
+  \item Sec.~5.1 (Core Data Structures – image representation)
+  \item Sec.~6.2 (IOService)
+  \item Sec.~7.1 (Import step in main flow)
+\end{itemize}
+\\ \hline
+
+FR-05 & Verify file type and size before processing &
+\begin{itemize}
+  \item IOService validation + error handling
+  \item Sec.~2.2 (I/O \& Privacy responsibilities)
+  \item Sec.~4.2 (File Interfaces – validation rules)
+  \item Sec.~8.1 (Error Classes and Recovery)
+  \item Sec.~9.2 (Threat Model – tampering checks)
+\end{itemize}
+\\ \hline
+
+FR-06 & Apply NMS and confidence thresholding to detections &
+\begin{itemize}
+  \item DetectionEngine
+  \item Sec.~3.1.1 (Detection Engine responsibilities)
+  \item Sec.~6.2 (DetectionEngine API)
+  \item Sec.~13.2 (Dataset-Based Evaluation – detection metrics)
+\end{itemize}
+\\ \hline
+
+FR-07 & Identify bounding boxes/ROIs and apply Gaussian blur &
+\begin{itemize}
+  \item RedactionPipeline \& BlurStrategy
+  \item Sec.~3.1.1 (Redaction Pipeline responsibilities)
+  \item Sec.~5.1 (Boxes/masks data structures)
+  \item Sec.~6.1 (Component/Class Diagram)
+  \item Sec.~6.2 (RedactionPipeline \& BlurStrategy APIs)
+  \item Sec.~6.3 (Strategy pattern for blur effects)
+  \item Sec.~7.1 (Redaction steps in sequence)
+\end{itemize}
+\\ \hline
+
+FR-08 & Export blurred image at original resolution &
+\begin{itemize}
+  \item RedactionPipeline (resolution-preserving) \& IOService
+  \item Sec.~2.3 (Primary User Workflow – Export)
+  \item Sec.~3.5 (UC-1: Blur a photo and export)
+  \item Sec.~5.1 (Image/mask alignment)
+  \item Sec.~6.2 (RedactionPipeline invariants, IOService::saveImage)
+  \item Sec.~11 (Deployment \& Installation – export behaviour)
+\end{itemize}
+\\ \hline
+
+FR-09 & Handle failed uploads and model inference errors gracefully &
+\begin{itemize}
+  \item Error handling and recovery
+  \item Sec.~2.3 (Alternate flows: invalid file, slow inference)
+  \item Sec.~3.2 (Process View – cancellation, rollback)
+  \item Sec.~4.1 (UI error banners)
+  \item Sec.~8.1 (Error Classes and Recovery)
+  \item Sec.~8.2 (Logging – local diagnostics)
+\end{itemize}
+\\ \hline
+
+FR-10 & Support ``no detections'' flow with manual-only blur mode &
+\begin{itemize}
+  \item Qt GUI + SessionController alternate path
+  \item Sec.~2.3 (Primary Workflow – ``no alcohol detected'' message)
+  \item Sec.~3.2 (Alternate flows)
+  \item Sec.~3.5 (UC-1 \& UC-2 interactions)
+  \item Sec.~7.1 (Sequence diagram – no-detections branch)
+\end{itemize}
+\\ \hline
+
+NFR-PERF & $\leq 10$~s per 1080p image; GUI actions $\leq 300$~ms &
+\begin{itemize}
+  \item Worker-thread process model \& performance targets
+  \item Sec.~3.2 (Process View – background worker, responsiveness)
+  \item Sec.~10.1 (Targets and Budgets)
+  \item Sec.~13.2 (Processing Time metric)
+  \item Sec.~13.3 (Acceptance Criteria – runtime requirements)
+\end{itemize}
+\\ \hline
+
+NFR-ACC & $\geq 80\%$ recall, $\leq 15\%$ false positives, stable mAP@0.5 &
+\begin{itemize}
+  \item Evaluation utilities \& dataset-based testing
+  \item Sec.~2.2 (Evaluation Utilities module)
+  \item Sec.~6.2 (EvaluationRunner)
+  \item Sec.~13.2 (Dataset-Based Evaluation)
+  \item Sec.~13.3 (Acceptance Criteria – accuracy requirements)
+\end{itemize}
+\\ \hline
+
+NFR-STAB & Stable import $\rightarrow$ detect $\rightarrow$ blur $\rightarrow$ preview $\rightarrow$ export workflow (no crashes/corruption) &
+\begin{itemize}
+  \item Lifecycle state machines, error recovery, and tests
+  \item Sec.~3.2 (Process View)
+  \item Sec.~7 (Dynamic Behavior – ImageSession lifecycle)
+  \item Sec.~8.1 (Error Classes and Recovery)
+  \item Sec.~13.1 (Test Levels – integration/system tests)
+  \item Sec.~13.3 (Acceptance Criteria – functional stability)
+\end{itemize}
+\\ \hline
+
+NFR-FID & Exported image preserves original resolution/quality and all blur regions as previewed &
+\begin{itemize}
+  \item Data \& redaction design
+  \item Sec.~2.3 (Primary User Workflow – export guarantees)
+  \item Sec.~5.1 (Core Data Structures – image + masks)
+  \item Sec.~6.2 (RedactionPipeline invariants, IOService)
+  \item Sec.~10.1 (Quality attributes)
+  \item Sec.~13.3 (Output Fidelity acceptance criteria)
+\end{itemize}
+\\ \hline
+
+NFR-UX & First-time user can blur \& export in $\leq 30$~s via intuitive workflow &
+\begin{itemize}
+  \item GUI layout, primary workflow, scenarios
+  \item Sec.~2.3 (Primary User Workflow)
+  \item Sec.~3.5 (Scenarios / Use-Case View)
+  \item Sec.~4.1 (User Interface – landing and edit/view pages)
+  \item Sec.~10.3 (Usability \& Accessibility)
+\end{itemize}
+\\ \hline
+
+NFR-UX-FB & Clear, discoverable controls; visual feedback; undo/redo without corruption &
+\begin{itemize}
+  \item Qt GUI behaviour, tool state, command pattern
+  \item Sec.~3.1.1 (Qt GUI responsibilities)
+  \item Sec.~3.5 (UC-2: Manual edit)
+  \item Sec.~6.2 (MainWindow, SessionController APIs)
+  \item Sec.~6.3 (Command pattern for undo/redo)
+  \item Sec.~7.2 (Tool Mode state machine)
+  \item Sec.~10.3 (Usability \& Accessibility)
+\end{itemize}
+\\ \hline
+
+NFR-PRIV & Local-only processing; no images or metadata leave the device &
+\begin{itemize}
+  \item I/O \& Privacy module, security \& privacy design
+  \item Sec.~2.1 (Context – standalone, no network)
+  \item Sec.~2.2 (I/O \& Privacy subsystem)
+  \item Sec.~5.3 (Persistence Strategy – no long-term storage)
+  \item Sec.~8.2 (Logging – no telemetry)
+  \item Sec.~9.1 (Privacy Principles)
+  \item Sec.~9.2 (Threat Model)
+  \item Sec.~11 (Deployment \& Installation – offline packaging)
+\end{itemize}
+\\ \hline
+
+NFR-LOG & Minimal, local-only logging; no telemetry or analytics &
+\begin{itemize}
+  \item Logging subsystem
+  \item Sec.~8.2 (Logging – rotating local logs, no sensitive data)
+  \item Sec.~9.1 (Privacy Principles – no external transmission)
+\end{itemize}
+\\ \hline
+
+NFR-PLAT & Target platform: Windows 10+ desktop, $\geq 8$~GB RAM, CPU-only baseline (GPU optional) &
+\begin{itemize}
+  \item Scope and deployment design
+  \item Sec.~1.2 (Scope)
+  \item Sec.~2.1 (Context)
+  \item Sec.~3.4 (Physical/Deployment View)
+  \item Sec.~10.1 (Capacity assumptions)
+  \item Sec.~11 (Deployment \& Installation)
+\end{itemize}
+\\ \hline
+
+NFR-DOC & User \& developer documentation; versioned model/config for reproducibility &
+\begin{itemize}
+  \item Reference material \& configuration management
+  \item Sec.~1.3 (Definitions, Acronyms, Abbreviations)
+    \item Appendix B (References)
+  \item Sec.~12.1 (Build Tooling)
+  \item Sec.~12.3 (Semantic Versioning \& Model Versioning)
+  \item Sec.~12.4 (Configuration Management)
+  \item Sec.~13.2 (Machine-readable evaluation reports)
+\end{itemize}
+\\ \hline
+
+NFR-MAINT & Modular, testable architecture with CI; easy to evolve and fix &
+\begin{itemize}
+  \item Architectural decomposition, components, CI/CD, maintenance
+  \item Sec.~3 (Architectural Design – 4+1 views)
+  \item Sec.~6 (Component Design)
+  \item Sec.~12.2 (CI Pipeline)
+  \item Sec.~13.1 (Test Levels)
+  \item Sec.~16 (Maintenance \& Support)
+\end{itemize}
+\\ \hline
+
+NFR-ETH & Evaluate model bias; communicate limitations/false positives; safe manual fallback &
+\begin{itemize}
+  \item Ethical / responsible ML use
+  \item Sec.~9.1 (Privacy Principles – institutional expectations)
+  \item Sec.~13.2 (Dataset-Based Evaluation – monitoring FP/FN)
+  \item Sec.~2.3 \& Sec.~3.2 (Alternate flows: false positives, manual correction)
+  \item Sec.~8.1 (Graceful degradation to manual mode)
+\end{itemize}
+\\ \hline
+
+\caption{Requirements-to-design traceability matrix mapping CleanShare's functional (FR) and non-functional (NFR) requirements to SDD design elements and sections.}
+\label{tab:CleanShare-RDT}
+
+\end{longtable}
+
+
+The design of CleanShare shows the requirements outlined for the project, each major requirement maps to a specific part of the system. To start off the requirement for offline functionality is met by making the tool a local desktop application where all processing happens in house. The requirement of accepting standard image formats is demonstrated by the image processor which accepts both PNG and JPEG file types. The requirement for alcoholic beverage cans / bottles is fulfilled through the CNN machine learning model which we will integrate into the Detection Engine, thus allowing the system to identify bottles and cans in any image. Once the ML model detects a specific area, our blur pipeline applies Gaussian blur to the detected regions, meeting the requirement to blur out alcoholic content. Finally the requirement for a user friendly, non technical interface is supported through a simple user interface, where users can import an image, run the detection, make optional manual adjustments, and export the final result. This straightforward process ensures that the system is easy to navigate and use, even for individuals without technical experience.
+
+
+% Helpful labels to cross-reference
+\label{sec:logical}
+\label{sec:dynamic}
+\label{sec:ui}
+\label{sec:component}
+\label{sec:perf}
+\label{sec:secpriv}
+
+% ============================================================
+\appendix
+\section{Glossary}
+This glossary summarizes key terms used throughout the document. For extended definitions, see Section~1.3.
+
+\begin{description}[leftmargin=2.5cm, style=nextline]
+
+\item[CleanShare]
+The CISC 320 group project desktop application that detects alcoholic beverages in still images and applies blur redaction so they can be shared safely while keeping all processing local.
+
+\item[Application Core]
+The middle layer of the architecture that orchestrates image loading, model inference, redaction, and exporting, insulated from the GUI and low-level libraries.
+
+\item[GUI (Graphical User Interface)]
+The front-end of CleanShare implemented with Qt, providing windows, buttons, menus, image previews, and interaction with the user.
+
+\item[Qt]
+A cross-platform application framework used for the CleanShare desktop GUI, handling windows, widgets, events, and image display.
+
+\item[OpenCV]
+An open-source computer vision library used for reading/writing images, resizing, color conversions, drawing blur masks, and handling image matrices.
+
+\item[ONNX]
+(Open Neural Network Exchange) A standard format for representing trained neural network models, allowing CleanShare to run the detector independently of the original training framework.
+
+\item[ONNX Runtime]
+A high-performance inference engine for ONNX models used by CleanShare to run the YOLO detector efficiently on the user’s machine.
+
+\item[CNN (Convolutional Neural Network)]
+A type of deep neural network specialized for processing images, used by CleanShare’s detector to recognize alcoholic beverages.
+
+\item[YOLO]
+(\emph{You Only Look Once}) A family of real-time object detection architectures used as the basis for CleanShare’s bottle/can detector (e.g., Ultralytics YOLOv8/YOLOv11 variants).
+
+\item[Liquor Data Dataset]
+An annotated dataset of alcoholic beverage images (bottles, cans, cartons, etc.) used to fine-tune the YOLO detector for CleanShare’s specific task.
+
+\item[Bounding Box]
+An axis-aligned rectangle predicted by the detector that encloses a candidate alcoholic item in the image.
+
+\item[ROI (Region of Interest)]
+Any region in the image that is considered relevant for processing; in CleanShare this typically refers to detected alcohol boxes or user-drawn corrections.
+
+\item[ROI Mask]
+A binary (or multi-channel) image that marks which pixels are inside redaction regions; used by the Redaction Pipeline to apply blur only where needed.
+
+\item[NMS (Non-Maximum Suppression)]
+A post-processing step that filters overlapping detection boxes by keeping the highest-confidence box and discarding redundant ones, reducing duplicate detections.
+
+\item[Detection Engine]
+The core service responsible for loading the ONNX model, running inference on images, and producing raw detection boxes, classes, and confidence scores.
+
+\item[Redaction Pipeline]
+The component that converts detections (plus manual edits) into final blur masks and applies the selected blur strategy to the image.
+
+\item[ImageSession]
+An in-memory data structure representing the state for a single loaded image, including the original pixels, preview image, detection results, user overrides, and export status.
+
+\item[Session State]
+The overall state managed by the Application Core, including the current \texttt{ImageSession}, configuration, undo stack, and progress flags used for the GUI.
+
+\item[Blur Strategy]
+A configurable policy that defines how redaction is applied (e.g., Gaussian blur with a given kernel size, pixelation strength, or solid fill) to all active masks.
+
+\item[Configuration]
+Structured parameters that influence detection thresholds, NMS settings, blur strength, performance limits (e.g., max resolution), and UI preferences.
+
+\item[Evaluation Utilities]
+Internal tooling for measuring model performance (e.g., precision, recall, mAP, latency) on validation data to ensure CleanShare meets its accuracy and runtime targets.
+
+\item[Precision]
+The proportion of predicted alcohol detections that are actually correct (true positives divided by all predicted positives).
+
+\item[Recall]
+The proportion of real alcohol instances in the images that are successfully detected (true positives divided by all ground-truth positives).
+
+\item[False Positive Rate]
+The fraction of predictions that incorrectly flag non-alcohol content as alcohol, relative to all predicted detections.
+
+\item[mAP@0.5]
+Mean Average Precision computed at an Intersection-over-Union (IoU) threshold of 0.5, summarizing detection quality across classes.
+
+\item[1080p]
+A common image resolution of 1920\,$\times$\,1080 pixels; CleanShare’s performance targets (e.g., $\leq 10$\,s per image) are specified relative to this resolution.
+
+\item[Local-only Processing]
+An architectural guarantee that all inference, redaction, and previews run entirely on the user’s machine, with no network requests or remote logging.
+
+\end{description}
+
+
+\section{References}
+
+\begin{thebibliography}{9}
+
+\bibitem{CleanShareRAD}
+CleanShare Team,
+\newblock \emph{CISC 320 CleanShare Requirements Analysis Document (RAD)}.
+\newblock Queen's University, School of Computing, 2025.
+
+\bibitem{CISC320Outline}
+CISC~320 Instructional Staff,
+\newblock \emph{CISC 320 Project Outline: CleanShare Alcohol-Redaction Tool}.
+\newblock Queen's University, School of Computing, 2025.
+
+\bibitem{QtDocs}
+The Qt Company,
+\newblock \emph{Qt 6 Documentation}.
+\newblock Available at: \url{https://doc.qt.io/qt-6/index.html}. Accessed Nov.~2025.
+
+\bibitem{OpenCV}
+OpenCV Team,
+\newblock \emph{OpenCV: Open Source Computer Vision Library Documentation}.
+\newblock Available at: \url{https://docs.opencv.org/}. Accessed Nov.~2025.
+
+\bibitem{ONNXRuntime}
+Microsoft and ONNX Community,
+\newblock \emph{ONNX Runtime Documentation}.
+\newblock Available at: \url{https://onnxruntime.ai/docs/}. Accessed Nov.~2025.
+
+\bibitem{UltralyticsYOLO}
+Ultralytics,
+\newblock \emph{Ultralytics YOLOv8/YOLOv11 Documentation}.
+\newblock Available at: \url{https://docs.ultralytics.com/}. Accessed Nov.~2025.
+
+\bibitem{LiquorData}
+Lamar University,
+\newblock \emph{Liquor-data: Alcoholic Beverage Object Detection Dataset}.
+\newblock Roboflow Universe, Available at: \url{https://universe.roboflow.com}. Accessed Nov.~2025.
+
+\end{thebibliography}
+
+
+
+
+\end{document}
