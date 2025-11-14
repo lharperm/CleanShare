@@ -1,0 +1,174 @@
+%%%%%%%%%%
+% LaTeX Problem Set Template
+% CISC 203: Discrete Mathematics for Computing II
+% Queen's University, Fall 2020
+% 
+% Adapted for CISC 320 Project Proposal
+%%%%%%%%%%
+
+\documentclass{article}
+
+%%%%%%%%%%
+% YOUR INFO
+%%%%%%%%%%
+
+\newcommand{\MyName}{CleanShare}
+\newcommand{\PSNumber}{1}
+
+%%%%%%%%%%
+% Packages
+%%%%%%%%%%
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead[L]{\MyName}
+\fancyhead[C]{CISC 320 Project Outline}
+\fancyhead[R]{Page \thepage}
+\fancyfoot{}
+\fancypagestyle{firstpage}{%
+    \fancyhf{}
+}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz, url}
+\usetikzlibrary{arrows.meta, calc, chains, decorations.pathreplacing, graphs, graphs.standard, matrix, positioning, shapes, trees}
+
+%%%%%%%%%%
+% Metadata
+%%%%%%%%%%
+\title{CISC 320 Project Outline\\CleanShare}
+\author{Section 3 - Group 6\\David Balan\\Anthony Grecu\\Charlie Guarasci\\Liam Harper-Mccabe\\Kieron Luke\\Mark Nistor\\Kayetan Protas}
+\date{\today}
+
+%%%%%%%%%%
+% Document
+%%%%%%%%%%
+\begin{document}
+\maketitle
+
+\section*{General Purpose}
+CleanShare is a desktop application designed to automatically detect and blur alcoholic beverages in photos before they are shared. The purpose is to make images safe for posting on university-affiliated social media or sharing with family without manual editing, ensuring compliance with student guidelines and community standards.
+
+\section*{Intended Audience}
+\begin{itemize}
+    \item \textbf{Primary:} University students, club social media managers, and campus event organizers who need to share photos publicly while avoiding alcohol-related content.  
+    \item \textbf{Secondary:} High-school counselors, event photographers, and anyone who needs ``safe-to-share'' photos in a professional or family context.  
+\end{itemize}
+
+\section*{Features}
+\begin{itemize}
+    \item \textbf{Image Upload \& Export:} Users can submit a single image (initially) and export the blurred result in the same dimensions as the original.  
+    \item \textbf{Automatic Detection \& Blur:} The system uses OpenCV for object detection, enhanced with a CNN model for higher accuracy. Any detected alcohol container, whether by branding or shape, will be blurred.  
+    \item \textbf{Manual Adjustment Tools:} Users can refine blur regions with basic brush or rectangle tools.  
+    \item \textbf{Preview:} Side-by-side before/after comparison before saving.  
+    \item \textbf{Batch Processing (Stretch Goal):} Start with single-image support; expand to batch mode later in the project.  
+    \item \textbf{Privacy by Design:} All processing is done locally on the user’s machine so no cloud uploads.  
+\end{itemize}
+
+\section*{Data Handled}
+\begin{itemize}
+    \item \textbf{Input:} User-submitted photos in common formats (JPEG, PNG).  
+    \item \textbf{Processing Data:} Temporary metadata (bounding boxes, masks, CNN predictions) generated during blur operations.  
+    \item \textbf{Output:} Exported images with blurred alcohol content. No personal information is stored.  
+\end{itemize}
+
+\section*{Technical Approach}
+\begin{itemize}
+    \item \textbf{Platform Priority:} Windows-only for grading and development.  
+    \item \textbf{Tech Stack:} C++ with Qt for the GUI, OpenCV for image handling and baseline detection, and ONNX Runtime to integrate a bundled CNN model for robust alcohol detection.  
+    \item \textbf{Model:} Pre-trained CNN weights will be packaged with the repo for local inference.  
+    \item \textbf{Dataset:} Team will use a custom image set of various alcohol bottles to test detection and accuracy.  
+\end{itemize}
+
+\section*{Relevance \& Impact}
+CleanShare reduces the time and effort required for manual redaction of alcohol in photos. It provides a practical tool for students, clubs, and organizations to share photos responsibly, while ensuring compliance with university and community policies.
+
+\section*{Motivation}
+Many student organizations face restrictions when posting event photos that display alcohol. Manually blurring drinks is not only time-consuming but also inconsistent and prone to error, often leading to compliance risks or damaged reputations. In today’s digital-first environment, where student groups and individuals are judged by what they post online, the stakes are higher than ever. A single overlooked bottle in a photo could cause disciplinary action, loss of funding for clubs, or embarrassment in a professional or family setting.  
+
+By automating this process, CleanShare addresses a problem that is both practical and reputational. It saves organizations countless hours of tedious editing while creating a uniform standard of “safe-to-share” imagery. Beyond convenience, it actively protects students, clubs, and institutions from unnecessary risks. This is not simply a matter of efficiency; it is a matter of digital responsibility, reputation management, and creating an environment where people can confidently share their experiences without fear of unintended consequences.  
+
+\section*{Functional Requirements}
+The functional requirements describe what CleanShare must provide for its users:
+\begin{itemize}
+    \item The system must allow users to upload images in standard formats (JPEG, PNG).  
+    \item The system must detect and blur alcoholic beverages automatically using computer vision techniques.    
+    \item The system must offer a preview mode with a side-by-side comparison before saving.  
+    \item The system must allow exporting of the processed image in the same resolution as the original.  
+    \item The system must process images locally without requiring internet access or cloud uploads.  
+\end{itemize}
+
+\section*{Non-Functional Requirements}
+The non-functional requirements define the quality, performance, and constraints of the system:
+\begin{itemize}
+    \item \textbf{Performance:} A 1080p photo should be processed in under 10 seconds on a typical Windows laptop.  
+    \item \textbf{Usability:} The workflow should be intuitive enough that a first-time user can blur and export an image in under 30 seconds.  
+    \item \textbf{Reliability:} The system should consistently detect at least 80\% of alcohol containers while keeping false positives to a minimum.  
+    \item \textbf{Security:} All processing occurs locally; no personal data or images leave the user’s machine.  
+    \item \textbf{Portability:} The initial release will target Windows; later versions may support other platforms.  
+    \item \textbf{Maintainability:} The system should be built with modular components (GUI, detection, processing) to simplify future improvements.  
+\end{itemize}
+
+\section*{Evaluation and Success Criteria}
+We will evaluate CleanShare through a custom dataset of alcohol-containing images. Success will be measured by:
+\begin{itemize}
+    \item Achieving recall above 80\% (most alcoholic containers are detected).  
+    \item Maintaining low false positives (non-alcoholic items rarely blurred).  
+    \item Processing a 1080p photo in under 10 seconds on a typical Windows laptop.  
+    \item Delivering an intuitive workflow where a user can blur and export in under 30 seconds.  
+\end{itemize}
+
+\section*{Milestones / Development Plan}
+\begin{itemize}
+    \item Week 1--2: Develop Qt GUI framework; implement manual blur tool.  
+    \item Week 3: Add OpenCV-based heuristic detection; enable preview and save.  
+    \item Week 4: Integrate CNN detection with ONNX Runtime.  
+    \item Week 5: Testing, refinement, dataset evaluation, and documentation.  
+\end{itemize}
+
+\section*{Limitations and Risks}
+\begin{itemize}
+    \item False positives (e.g., soda cans blurred incorrectly).  
+    \item False negatives in low-light or crowded images.  
+    \item Dataset bias due to limited examples of certain alcohol types.  
+    \item Project timeline may restrict advanced features like batch processing.  
+\end{itemize}
+
+\section*{Future Extensions}
+\begin{itemize}
+    \item Batch processing for entire image folders.  
+    \item Multiple blur styles (Gaussian, pixelation, mosaic).  
+    \item Social media integration for direct posting.  
+    \item User-defined presets for sensitivity and blur strength.  
+\end{itemize}
+
+\section*{References}
+
+\begin{enumerate}
+    % Core Libraries
+    \item Bradski, G. (2000). The OpenCV Library. \textit{Dr. Dobb's Journal of Software Tools}.
+    \item Qt Company. (2024). \textit{Qt Documentation}. Retrieved from\\ \url{https://doc.qt.io}
+    \item Microsoft. (2024). \textit{ONNX Runtime Documentation}. Retrieved from\\ \url{https://onnxruntime.ai}
+    
+    % Object Detection and CNNs
+    \item Redmon, J., Divvala, S., Girshick, R., \& Farhadi, A. (2016). You Only Look Once: Unified, Real-Time Object Detection. \textit{Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}.
+    \item He, K., Zhang, X., Ren, S., \& Sun, J. (2016). Deep Residual Learning for Image Recognition. \textit{Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}.
+    \item Kingma, D. P., \& Ba, J. (2015). Adam: A Method for Stochastic Optimization. \textit{International Conference on Learning Representations (ICLR)}.
+    
+    % Image Processing Theory
+    \item Gonzalez, R. C., \& Woods, R. E. (2018). \textit{Digital Image Processing} (4th ed.). Pearson.
+    \item Szeliski, R. (2022). \textit{Computer Vision: Algorithms and Applications} (2nd ed.). Springer.  
+
+    % Practical "How-To" Resources
+    \item OpenCV Team. (2024). \textit{Image Blurring with OpenCV}. Retrieved from\\ \url{https://docs.opencv.org/4.x/d4/d13/tutorial_py_filtering.html}
+    \item Qt Company. (2024). \textit{Qt Widgets Tutorial}. Retrieved from\\ \url{https://doc.qt.io/qt-6/widgets-tutorial.html}
+    \item ONNX. (2024). \textit{Exporting Models to ONNX}. Retrieved from\\ \url{https://onnx.ai/getting-started.html}
+    \item Hugging Face. (2024). \textit{Hugging Face — The AI community building the future}. Retrieved from\\ \url{https://huggingface.co/}
+    \item GeeksforGeeks. (2025, May 30). \textit{Introduction to GUI Programming in C++}. Retrieved from\\ \url{https://www.geeksforgeeks.org/cpp/cpp-gui-programming/}
+    \item Towards Data Science. (2024). \textit{Convolutional Neural Networks for Beginners}. Retrieved from \\ \url{https://towardsdatascience.com/convolutional-neural-networks-for-beginners-c1de55eee2b2/}
+
+\end{enumerate}
+
+\end{document}
