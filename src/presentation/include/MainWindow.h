@@ -10,14 +10,16 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override = default;
 
-    signals:
-        void importImageRequested();
+signals:
+    void importImageRequested();
     void runDetectionRequested();
     void exportImageRequested();
+    void importImageFromPathRequested(const QString& path);
 
 public slots:
     void onImageUpdated(const QImage& original, const QImage& redactedPreview);
     void showStatusMessage(const QString& msg);
+    void handleImageFileDropped(const QString& path);
 
 private slots:
     void handleImportTriggered();

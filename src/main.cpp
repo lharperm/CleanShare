@@ -12,6 +12,8 @@ int main(int argc, char* argv[]) {
     // GUI -> core
     QObject::connect(&window, &MainWindow::importImageRequested,
                      &controller, &SessionController::handleImportImage);
+	QObject::connect(&window, &MainWindow::importImageFromPathRequested,
+                     &controller, &SessionController::handleImportImageFromPath);
     QObject::connect(&window, &MainWindow::runDetectionRequested,
                      &controller, &SessionController::handleRunDetection);
     QObject::connect(&window, &MainWindow::exportImageRequested,

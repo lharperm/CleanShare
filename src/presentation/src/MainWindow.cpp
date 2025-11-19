@@ -50,11 +50,19 @@ void MainWindow::createCentralPane() {
     auto* layout = new QVBoxLayout(central);
 
     m_previewWidget = new ImagePreviewWidget(central);
+	connect(m_previewWidget, &ImagePreviewWidget::autoDetectClicked,
+        this, &MainWindow::handleDetectTriggered);
+
+    connect(m_previewWidget, &ImagePreviewWidget::imageFileDropped,
+        this, &MainWindow::handleImageFileDropped);
+
     layout->addWidget(m_previewWidget);
 
     layout->setContentsMargins(4, 4, 4, 4);
     central->setLayout(layout);
     setCentralWidget(central);
+
+	connect(m_previewWidget, &ImagePreviewWidget::autoDetectClicked,this, &MainWindow::handleDetectTriggered);
 }
 
 void MainWindow::handleImportTriggered() {
@@ -85,3 +93,8 @@ void MainWindow::showStatusMessage(const QString& msg) {
     constexpr int DEFAULT_TIMEOUT_MS = 3000;
     statusBar()->showMessage(msg, DEFAULT_TIMEOUT_MS);
 }
+
+void MainWindow::handleImageFileDropped(const QString& path) {
+    emit importImageFromPathRequested(path);
+}
+

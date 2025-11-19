@@ -1,5 +1,6 @@
 D:/Code/CISC320/Project/build/src/cleanshare_core_autogen/include_Release/TAC5DWH4SE/moc_SessionController.cpp: D:/Code/CISC320/Project/src/core/SessionController.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/QObject \
+  C:/Qt/6.10.0/msvc2022_64/include/QtCore/QString \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/q17memory.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/q20functional.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/q20iterator.h \

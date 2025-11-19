@@ -47,6 +47,8 @@ template <> constexpr inline auto SessionController::qt_create_metaobjectdata<qt
         "statusMessage",
         "msg",
         "handleImportImage",
+        "handleImportImageFromPath",
+        "path",
         "handleRunDetection",
         "handleExportImage"
     };
@@ -62,10 +64,14 @@ template <> constexpr inline auto SessionController::qt_create_metaobjectdata<qt
         }}),
         // Slot 'handleImportImage'
         QtMocHelpers::SlotData<void()>(8, 2, QMC::AccessPublic, QMetaType::Void),
+        // Slot 'handleImportImageFromPath'
+        QtMocHelpers::SlotData<void(const QString &)>(9, 2, QMC::AccessPublic, QMetaType::Void, {{
+            { QMetaType::QString, 10 },
+        }}),
         // Slot 'handleRunDetection'
-        QtMocHelpers::SlotData<void()>(9, 2, QMC::AccessPublic, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(11, 2, QMC::AccessPublic, QMetaType::Void),
         // Slot 'handleExportImage'
-        QtMocHelpers::SlotData<void()>(10, 2, QMC::AccessPublic, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(12, 2, QMC::AccessPublic, QMetaType::Void),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -92,8 +98,9 @@ void SessionController::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
         case 0: _t->imageUpdated((*reinterpret_cast<std::add_pointer_t<QImage>>(_a[1])),(*reinterpret_cast<std::add_pointer_t<QImage>>(_a[2]))); break;
         case 1: _t->statusMessage((*reinterpret_cast<std::add_pointer_t<QString>>(_a[1]))); break;
         case 2: _t->handleImportImage(); break;
-        case 3: _t->handleRunDetection(); break;
-        case 4: _t->handleExportImage(); break;
+        case 3: _t->handleImportImageFromPath((*reinterpret_cast<std::add_pointer_t<QString>>(_a[1]))); break;
+        case 4: _t->handleRunDetection(); break;
+        case 5: _t->handleExportImage(); break;
         default: ;
         }
     }
@@ -124,14 +131,14 @@ int SessionController::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 6)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 6;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 6)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 5;
+        _id -= 6;
     }
     return _id;
 }

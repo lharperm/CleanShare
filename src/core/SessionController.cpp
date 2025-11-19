@@ -8,17 +8,8 @@ SessionController::SessionController(QObject* parent)
 {
 }
 
-void SessionController::handleImportImage() {
-    const QString picturesDir =
-        QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
-
-    QString path = QFileDialog::getOpenFileName(
-        nullptr,
-        "Import image",
-        picturesDir,
-        "Images (*.png *.jpg *.jpeg)"
-    );
-
+void SessionController::loadImageFromPath(const QString& path)
+{
     if (path.isEmpty()) {
         emit statusMessage("Import cancelled");
         return;
@@ -31,32 +22,54 @@ void SessionController::handleImportImage() {
     }
 
     m_original = img;
-    m_redacted = QImage();
+    m_redacted = QImage();  // nothing redacted yet
 
     emit statusMessage("Image loaded");
     emit imageUpdated(m_original, m_redacted);
 }
 
-void SessionController::handleRunDetection() {
+void SessionController::handleImportImage()
+{
+    const QString picturesDir =
+        QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+
+    const QString path = QFileDialog::getOpenFileName(
+        nullptr,
+        "Import image",
+        picturesDir,
+        "Images (*.png *.jpg *.jpeg)"
+    );
+
+    loadImageFromPath(path);
+}
+
+void SessionController::handleImportImageFromPath(const QString& path)
+{
+    loadImageFromPath(path);
+}
+
+void SessionController::handleRunDetection()
+{
     if (m_original.isNull()) {
         emit statusMessage("No image loaded");
         return;
     }
 
-    // TEMP: fake "redaction" by just copying.
+    // TEMP: fake detection – just copy original to "redacted"
     m_redacted = m_original;
 
     emit statusMessage("Detection stub: redacted = original (for now)");
     emit imageUpdated(m_original, m_redacted);
 }
 
-void SessionController::handleExportImage() {
+void SessionController::handleExportImage()
+{
     if (m_redacted.isNull()) {
         emit statusMessage("Nothing to export");
         return;
     }
 
-    QString path = QFileDialog::getSaveFileName(
+    const QString path = QFileDialog::getSaveFileName(
         nullptr,
         "Export image",
         {},

@@ -38,10 +38,20 @@ template <> constexpr inline auto ImagePreviewWidget::qt_create_metaobjectdata<q
 {
     namespace QMC = QtMocConstants;
     QtMocHelpers::StringRefStorage qt_stringData {
-        "ImagePreviewWidget"
+        "ImagePreviewWidget",
+        "autoDetectClicked",
+        "",
+        "imageFileDropped",
+        "path"
     };
 
     QtMocHelpers::UintData qt_methods {
+        // Signal 'autoDetectClicked'
+        QtMocHelpers::SignalData<void()>(1, 2, QMC::AccessPublic, QMetaType::Void),
+        // Signal 'imageFileDropped'
+        QtMocHelpers::SignalData<void(const QString &)>(3, 2, QMC::AccessPublic, QMetaType::Void, {{
+            { QMetaType::QString, 4 },
+        }}),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -63,10 +73,19 @@ Q_CONSTINIT const QMetaObject ImagePreviewWidget::staticMetaObject = { {
 void ImagePreviewWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     auto *_t = static_cast<ImagePreviewWidget *>(_o);
-    (void)_t;
-    (void)_c;
-    (void)_id;
-    (void)_a;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: _t->autoDetectClicked(); break;
+        case 1: _t->imageFileDropped((*reinterpret_cast<std::add_pointer_t<QString>>(_a[1]))); break;
+        default: ;
+        }
+    }
+    if (_c == QMetaObject::IndexOfMethod) {
+        if (QtMocHelpers::indexOfMethod<void (ImagePreviewWidget::*)()>(_a, &ImagePreviewWidget::autoDetectClicked, 0))
+            return;
+        if (QtMocHelpers::indexOfMethod<void (ImagePreviewWidget::*)(const QString & )>(_a, &ImagePreviewWidget::imageFileDropped, 1))
+            return;
+    }
 }
 
 const QMetaObject *ImagePreviewWidget::metaObject() const
@@ -85,6 +104,30 @@ void *ImagePreviewWidget::qt_metacast(const char *_clname)
 int ImagePreviewWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QWidget::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 2)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 2;
+    }
+    if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 2)
+            *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
+        _id -= 2;
+    }
     return _id;
+}
+
+// SIGNAL 0
+void ImagePreviewWidget::autoDetectClicked()
+{
+    QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
+}
+
+// SIGNAL 1
+void ImagePreviewWidget::imageFileDropped(const QString & _t1)
+{
+    QMetaObject::activate<void>(this, &staticMetaObject, 1, nullptr, _t1);
 }
 QT_WARNING_POP
