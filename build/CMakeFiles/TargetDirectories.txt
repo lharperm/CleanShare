@@ -1,0 +1,5 @@
+D:/Code/CISC320/Project/build/CMakeFiles/ALL_BUILD.dir
+D:/Code/CISC320/Project/build/CMakeFiles/ZERO_CHECK.dir
+D:/Code/CISC320/Project/build/src/CMakeFiles/cleanshare_core.dir
+D:/Code/CISC320/Project/build/src/CMakeFiles/cleanshare_app.dir
+D:/Code/CISC320/Project/build/src/presentation/CMakeFiles/cleanshare_presentation.dir

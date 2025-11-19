@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"D:/Code/CISC320/Project/build/cmake_install.cmake",
+		"D:/Code/CISC320/Project/build/src/cmake_install.cmake",
+		"D:/Code/CISC320/Project/build/src/presentation/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
