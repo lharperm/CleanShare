@@ -1,0 +1,7 @@
+set(__QT_DEPLOY_TARGET_cleanshare_core_FILE C:/Users/dacia/Documents/School/Fall25/CISC320/CleanShare/cleanshare/build-mingw-fresh/lib/libcleanshare_core.a)
+set(__QT_DEPLOY_TARGET_cleanshare_core_TYPE STATIC_LIBRARY)
+set(__QT_DEPLOY_TARGET_cleanshare_presentation_FILE C:/Users/dacia/Documents/School/Fall25/CISC320/CleanShare/cleanshare/build-mingw-fresh/lib/libcleanshare_presentation.a)
+set(__QT_DEPLOY_TARGET_cleanshare_presentation_TYPE STATIC_LIBRARY)
+set(__QT_DEPLOY_TARGET_cleanshare_app_FILE C:/Users/dacia/Documents/School/Fall25/CISC320/CleanShare/cleanshare/build-mingw-fresh/bin/CleanShare.exe)
+set(__QT_DEPLOY_TARGET_cleanshare_app_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_cleanshare_app_RUNTIME_DLLS C:/Qt/6.10.0/mingw_64/bin/Qt6Widgets.dll;C:/Qt/6.10.0/mingw_64/bin/Qt6Gui.dll;C:/Qt/6.10.0/mingw_64/bin/Qt6Core.dll)

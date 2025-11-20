@@ -8,8 +8,17 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QSlider>
+#include <QToolButton>
+#include <QSpinBox>
 #include <QString>
 #include <QPixmap>
+#include <QImage>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
+#include <QUrl>
+#include <QTimer>
+#include <QFutureWatcher>
 
 class ImageCanvas;  // forward declaration
 
@@ -20,14 +29,31 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
 
+protected:
+    // Track keyboard modifiers to update selection-mode buttons when user presses Shift/Ctrl
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+
+protected:
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
+
 private slots:
     void onUploadClicked();
     void onDetectClicked();
     void onBlurSliderChanged(int);
+    void onBlurDebounceTimeout();
+    void onBackgroundBlurFinished();
     void onExportClicked();
     void onManualEditClicked();
     void onUndoClicked();
     void onRedoClicked();
+    void onSelectionChanged(const QImage &mask);
+    void onSelectionModeChanged(bool addMode, bool replaceMode);
+    void onSelectReplaceClicked(bool checked);
+    void onSelectAddClicked(bool checked);
+    void onSelectSubtractClicked(bool checked);
+    void onBlurSpinChanged(int value);
 
 private:
     void createHomePage();
@@ -53,7 +79,17 @@ private:
     QPushButton *m_exportButton;
     QPushButton *m_undoButton;
     QPushButton *m_redoButton;
+    QToolButton *m_selectReplaceButton;
+    QToolButton *m_selectAddButton;
+    QToolButton *m_selectSubtractButton;
     QSlider     *m_blurSlider;
+    QSpinBox    *m_blurSpinBox;
+    QTimer      *m_blurDebounceTimer;
+    int         m_pendingBlurValue;
+    bool        m_lastSelectionWasAddMode;
+    QLabel      *m_blurValueLabel;
+    QFutureWatcher<QPixmap> *m_blurWatcher;
+    int m_lastBlurJobStrength;
 
     QString m_currentImagePath;
     QPixmap m_originalPixmap;

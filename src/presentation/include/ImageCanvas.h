@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QPixmap>
 #include <QPainterPath>
-#include <QVector>
 
 class ImageCanvas : public QWidget
 {
@@ -14,11 +13,19 @@ public:
     explicit ImageCanvas(QWidget *parent = nullptr);
 
     void setImage(const QPixmap &pixmap);
+    void clearSelection();
     void setEditingEnabled(bool enabled);
-    bool editingEnabled() const { return m_editingEnabled; }
+    void setAddMode(bool add);
+    void setReplaceMode(bool replace);
 
-    // Optional, so MainWindow can give it a frame style like a QLabel
-    void setFrameStyle(int style) { m_frameStyle = style; update(); }
+    // Returns a mask in image coordinates (same size as original image).
+    QImage selectionMask() const;
+
+signals:
+    void selectionChanged(const QImage &mask);
+    // Emits (addMode, replaceMode): addMode=true means union operation when replaceMode==false.
+    // replaceMode=true means the stroke replaces the current selection.
+    void selectionModeChanged(bool addMode, bool replaceMode);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -29,16 +36,23 @@ protected:
 
 private:
     void updateScaledImage();
+    QRectF imageTargetRect() const;           // where the image is drawn in widget coords
+    QPointF widgetToImage(const QPointF &p) const;
+    void applyStrokeToSelection(bool replace, bool addMode);
 
-    QPixmap m_originalImage;
-    QPixmap m_scaledImage;
+    QPixmap      m_originalImage;
+    QPixmap      m_scaledImage;
+    QRectF       m_targetRect;               // widget rect where scaled image lives
 
-    bool m_editingEnabled;
-    bool m_drawing;
-    QPainterPath m_currentPath;
-    QVector<QPainterPath> m_paths;
+    bool         m_editingEnabled = false;
+    bool         m_drawing = false;
+    bool         m_addMode = true;           // true = add, false = subtract
+    bool         m_replaceMode = true;       // true when no modifier
 
-    int m_frameStyle;   // for a simple box border
+    QPainterPath m_currentPath;              // current stroke, in image coords
+    QPainterPath m_selectionPath;            // total selection, in image coords
+
+    qreal        m_brushRadius = 30.0;       // adjust to taste
 };
 
 #endif // IMAGECANVAS_H
