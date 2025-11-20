@@ -1,0 +1,12 @@
+--bare
+-I
+C:/Users/dacia/OneDrive/Documents/CleanShare/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug
+-I
+C:/Qt/6.10.0/mingw_64/qml
+--resource
+C:/Users/dacia/OneDrive/Documents/CleanShare/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/.qt/rcc/qmake_CleanShare.qrc
+--resource
+C:/Users/dacia/OneDrive/Documents/CleanShare/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/.qt/rcc/appCleanShare_raw_qml_0.qrc
+C:/Users/dacia/OneDrive/Documents/CleanShare/Main.qml
+--json
+C:/Users/dacia/OneDrive/Documents/CleanShare/build/Desktop_Qt_6_10_0_MinGW_64_bit-Debug/appCleanShare_qmllint.json
