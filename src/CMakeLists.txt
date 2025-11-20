@@ -9,7 +9,7 @@ set(APP_SOURCES
 
 # Only use the resources that actually exist
 set(APP_RESOURCES
-        ${CMAKE_CURRENT_LIST_DIR}/../Logo.qrc
+        ../assets/icons/Logo.qrc
         ${CMAKE_CURRENT_LIST_DIR}/../appicon.rc
 )
 
