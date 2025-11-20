@@ -1,26 +1,30 @@
-#pragma once
+#ifndef SESSIONCONTROLLER_H
+#define SESSIONCONTROLLER_H
 
-#include <QObject>
-#include <QImage>
+#include <QString>
+#include <QPixmap>
 
-class SessionController : public QObject {
-    Q_OBJECT
+class SessionController
+{
 public:
-    explicit SessionController(QObject* parent = nullptr);
+    SessionController();
 
-public slots:
-    void handleImportImage();                    // existing (file dialog)
-    void handleImportImageFromPath(const QString& path); // NEW
-    void handleRunDetection();
-    void handleExportImage();
+    bool loadImage(const QString &filePath);
 
-    signals:
-        void imageUpdated(const QImage& original, const QImage& redacted);
-    void statusMessage(const QString& msg);
+    // Applies fake blur based on strength [0, 100]
+    void applyFakeBlur(int strength);
+
+    const QPixmap &originalPixmap() const { return m_original; }
+    const QPixmap &blurredPixmap()  const { return m_blurred; }
+
+    bool hasImage() const { return !m_original.isNull(); }
+
+    const QString &currentImagePath() const { return m_currentImagePath; }
 
 private:
-    QImage m_original;
-    QImage m_redacted;
-
-    void loadImageFromPath(const QString& path); // NEW helper
+    QString m_currentImagePath;
+    QPixmap m_original;
+    QPixmap m_blurred;
 };
+
+#endif // SESSIONCONTROLLER_H

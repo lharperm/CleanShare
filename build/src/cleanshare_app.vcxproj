@@ -59,35 +59,35 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Code\CISC320\Project\build\src\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Code\CISC320\Project\build\bin\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cleanshare_app.dir\Debug\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cleanshare_app</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CleanShare</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Code\CISC320\Project\build\src\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Code\CISC320\Project\build\bin\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cleanshare_app.dir\Release\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cleanshare_app</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CleanShare</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Code\CISC320\Project\build\src\MinSizeRel\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Code\CISC320\Project\build\bin\MinSizeRel\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">cleanshare_app.dir\MinSizeRel\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">cleanshare_app</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CleanShare</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Code\CISC320\Project\build\src\RelWithDebInfo\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Code\CISC320\Project\build\bin\RelWithDebInfo\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">cleanshare_app.dir\RelWithDebInfo\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">cleanshare_app</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CleanShare</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_Debug;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtWidgets" /external:I "C:/Qt/6.10.0/msvc2022_64/include" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtCore" /external:I "C:/Qt/6.10.0/msvc2022_64/mkspecs/win32-msvc" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtGui" -Zc:__cplusplus -utf-8</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_Debug;D:\Code\CISC320\Project\src\core\include;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\presentation\..\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtCore" /external:I "C:/Qt/6.10.0/msvc2022_64/include" /external:I "C:/Qt/6.10.0/msvc2022_64/mkspecs/win32-msvc" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtGui" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtWidgets" -Zc:__cplusplus -utf-8</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -108,16 +108,16 @@
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;QT_WIDGETS_LIB;QT_CORE_LIB;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;QT_CORE_LIB;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;QT_WIDGETS_LIB;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;QT_WIDGETS_LIB;QT_CORE_LIB;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_Debug;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\core;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;QT_CORE_LIB;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;QT_WIDGETS_LIB;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_Debug;D:\Code\CISC320\Project\src\core\include;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\presentation\..\core\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_Debug;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\core;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_Debug;D:\Code\CISC320\Project\src\core\include;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\presentation\..\core\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -142,16 +142,16 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PreBuildEvent>
     <Link>
-      <AdditionalDependencies>presentation\Debug\cleanshare_presentation.lib;Debug\cleanshare_core.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Widgetsd.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Guid.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Cored.lib;mpr.lib;userenv.lib;d3d11.lib;dxgi.lib;dxguid.lib;d3d12.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\lib\Debug\cleanshare_core.lib;..\lib\Debug\cleanshare_presentation.lib;..\lib\Debug\cleanshare_core.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Widgetsd.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Guid.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Cored.lib;mpr.lib;userenv.lib;d3d11.lib;dxgi.lib;dxguid.lib;d3d12.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>D:/Code/CISC320/Project/build/src/Debug/cleanshare_app.lib</ImportLibrary>
+      <ImportLibrary>D:/Code/CISC320/Project/build/lib/Debug/CleanShare.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>D:/Code/CISC320/Project/build/src/Debug/cleanshare_app.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>D:/Code/CISC320/Project/build/bin/Debug/CleanShare.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -161,8 +161,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_Release;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtWidgets" /external:I "C:/Qt/6.10.0/msvc2022_64/include" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtCore" /external:I "C:/Qt/6.10.0/msvc2022_64/mkspecs/win32-msvc" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtGui" -Zc:__cplusplus -utf-8</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_Release;D:\Code\CISC320\Project\src\core\include;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\presentation\..\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtCore" /external:I "C:/Qt/6.10.0/msvc2022_64/include" /external:I "C:/Qt/6.10.0/msvc2022_64/mkspecs/win32-msvc" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtGui" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtWidgets" -Zc:__cplusplus -utf-8</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -182,18 +182,18 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NO_DEBUG;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_CORE_LIB;QT_NO_DEBUG;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;QT_WIDGETS_LIB;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NO_DEBUG;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_Release;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\core;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_CORE_LIB;QT_NO_DEBUG;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;QT_WIDGETS_LIB;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_Release;D:\Code\CISC320\Project\src\core\include;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\presentation\..\core\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_Release;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\core;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_Release;D:\Code\CISC320\Project\src\core\include;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\presentation\..\core\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -218,16 +218,16 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PreBuildEvent>
     <Link>
-      <AdditionalDependencies>presentation\Release\cleanshare_presentation.lib;Release\cleanshare_core.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Widgets.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Gui.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Core.lib;mpr.lib;userenv.lib;d3d11.lib;dxgi.lib;dxguid.lib;d3d12.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\lib\Release\cleanshare_core.lib;..\lib\Release\cleanshare_presentation.lib;..\lib\Release\cleanshare_core.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Widgets.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Gui.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Core.lib;mpr.lib;userenv.lib;d3d11.lib;dxgi.lib;dxguid.lib;d3d12.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>D:/Code/CISC320/Project/build/src/Release/cleanshare_app.lib</ImportLibrary>
+      <ImportLibrary>D:/Code/CISC320/Project/build/lib/Release/CleanShare.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>D:/Code/CISC320/Project/build/src/Release/cleanshare_app.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>D:/Code/CISC320/Project/build/bin/Release/CleanShare.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -237,8 +237,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_MinSizeRel;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtWidgets" /external:I "C:/Qt/6.10.0/msvc2022_64/include" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtCore" /external:I "C:/Qt/6.10.0/msvc2022_64/mkspecs/win32-msvc" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtGui" -Zc:__cplusplus -utf-8</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_MinSizeRel;D:\Code\CISC320\Project\src\core\include;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\presentation\..\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtCore" /external:I "C:/Qt/6.10.0/msvc2022_64/include" /external:I "C:/Qt/6.10.0/msvc2022_64/mkspecs/win32-msvc" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtGui" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtWidgets" -Zc:__cplusplus -utf-8</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -258,18 +258,18 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NO_DEBUG;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_CORE_LIB;QT_NO_DEBUG;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;QT_WIDGETS_LIB;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NO_DEBUG;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_MinSizeRel;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\core;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_CORE_LIB;QT_NO_DEBUG;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;QT_WIDGETS_LIB;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_MinSizeRel;D:\Code\CISC320\Project\src\core\include;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\presentation\..\core\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_MinSizeRel;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\core;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_MinSizeRel;D:\Code\CISC320\Project\src\core\include;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\presentation\..\core\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -294,16 +294,16 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PreBuildEvent>
     <Link>
-      <AdditionalDependencies>presentation\MinSizeRel\cleanshare_presentation.lib;MinSizeRel\cleanshare_core.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Widgets.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Gui.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Core.lib;mpr.lib;userenv.lib;d3d11.lib;dxgi.lib;dxguid.lib;d3d12.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\lib\MinSizeRel\cleanshare_core.lib;..\lib\MinSizeRel\cleanshare_presentation.lib;..\lib\MinSizeRel\cleanshare_core.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Widgets.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Gui.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Core.lib;mpr.lib;userenv.lib;d3d11.lib;dxgi.lib;dxguid.lib;d3d12.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>D:/Code/CISC320/Project/build/src/MinSizeRel/cleanshare_app.lib</ImportLibrary>
+      <ImportLibrary>D:/Code/CISC320/Project/build/lib/MinSizeRel/CleanShare.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>D:/Code/CISC320/Project/build/src/MinSizeRel/cleanshare_app.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>D:/Code/CISC320/Project/build/bin/MinSizeRel/CleanShare.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -313,8 +313,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_RelWithDebInfo;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtWidgets" /external:I "C:/Qt/6.10.0/msvc2022_64/include" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtCore" /external:I "C:/Qt/6.10.0/msvc2022_64/mkspecs/win32-msvc" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtGui" -Zc:__cplusplus -utf-8</AdditionalOptions>
+      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_RelWithDebInfo;D:\Code\CISC320\Project\src\core\include;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\presentation\..\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtCore" /external:I "C:/Qt/6.10.0/msvc2022_64/include" /external:I "C:/Qt/6.10.0/msvc2022_64/mkspecs/win32-msvc" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtGui" /external:I "C:/Qt/6.10.0/msvc2022_64/include/QtWidgets" -Zc:__cplusplus -utf-8</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -335,16 +335,16 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <SupportJustMyCode></SupportJustMyCode>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NO_DEBUG;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_CORE_LIB;QT_NO_DEBUG;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;QT_WIDGETS_LIB;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_WIDGETS_LIB;QT_CORE_LIB;QT_NO_DEBUG;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_RelWithDebInfo;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\core;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;QT_CORE_LIB;QT_NO_DEBUG;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;_WIN64;UNICODE;_UNICODE;QT_GUI_LIB;QT_WIDGETS_LIB;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_RelWithDebInfo;D:\Code\CISC320\Project\src\core\include;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\presentation\..\core\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_RelWithDebInfo;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\core;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\include_RelWithDebInfo;D:\Code\CISC320\Project\src\core\include;D:\Code\CISC320\Project\src\presentation\include;D:\Code\CISC320\Project\src\presentation\..\core\include;C:\Qt\6.10.0\msvc2022_64\include\QtCore;C:\Qt\6.10.0\msvc2022_64\include;C:\Qt\6.10.0\msvc2022_64\mkspecs\win32-msvc;C:\Qt\6.10.0\msvc2022_64\include\QtGui;C:\Qt\6.10.0\msvc2022_64\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -369,16 +369,16 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PreBuildEvent>
     <Link>
-      <AdditionalDependencies>presentation\RelWithDebInfo\cleanshare_presentation.lib;RelWithDebInfo\cleanshare_core.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Widgets.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Gui.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Core.lib;mpr.lib;userenv.lib;d3d11.lib;dxgi.lib;dxguid.lib;d3d12.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\lib\RelWithDebInfo\cleanshare_core.lib;..\lib\RelWithDebInfo\cleanshare_presentation.lib;..\lib\RelWithDebInfo\cleanshare_core.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Widgets.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Gui.lib;C:\Qt\6.10.0\msvc2022_64\lib\Qt6Core.lib;mpr.lib;userenv.lib;d3d11.lib;dxgi.lib;dxguid.lib;d3d12.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>D:/Code/CISC320/Project/build/src/RelWithDebInfo/cleanshare_app.lib</ImportLibrary>
+      <ImportLibrary>D:/Code/CISC320/Project/build/lib/RelWithDebInfo/CleanShare.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>D:/Code/CISC320/Project/build/src/RelWithDebInfo/cleanshare_app.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>D:/Code/CISC320/Project/build/bin/RelWithDebInfo/CleanShare.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -386,6 +386,83 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\Code\CISC320\Project\build\CMakeFiles\161792348f8f62d5c28652eb52b0e140\qrc_Logo.cpp.rule">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Automatic RCC for ../Logo.qrc</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd D:\Code\CISC320\Project\build\src
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E cmake_autorcc D:/Code/CISC320/Project/build/src/CMakeFiles/cleanshare_app_autogen.dir/AutoRcc_Logo_YCDLW3T4OG_Info.json Debug
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Code\CISC320\Project\Logo.qrc;D:\Code\CISC320\Project\build\src\CMakeFiles\cleanshare_app_autogen.dir\AutoRcc_Logo_YCDLW3T4OG_Info.json;D:\Code\CISC320\Project\CleanShareLogo.ico;C:\Qt\6.10.0\msvc2022_64\bin\rcc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\YCDLW3T4OG_Debug\qrc_Logo.cpp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Automatic RCC for ../Logo.qrc</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd D:\Code\CISC320\Project\build\src
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E cmake_autorcc D:/Code/CISC320/Project/build/src/CMakeFiles/cleanshare_app_autogen.dir/AutoRcc_Logo_YCDLW3T4OG_Info.json Release
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Code\CISC320\Project\Logo.qrc;D:\Code\CISC320\Project\build\src\CMakeFiles\cleanshare_app_autogen.dir\AutoRcc_Logo_YCDLW3T4OG_Info.json;D:\Code\CISC320\Project\CleanShareLogo.ico;C:\Qt\6.10.0\msvc2022_64\bin\rcc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\YCDLW3T4OG_Release\qrc_Logo.cpp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Automatic RCC for ../Logo.qrc</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd D:\Code\CISC320\Project\build\src
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E cmake_autorcc D:/Code/CISC320/Project/build/src/CMakeFiles/cleanshare_app_autogen.dir/AutoRcc_Logo_YCDLW3T4OG_Info.json MinSizeRel
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Code\CISC320\Project\Logo.qrc;D:\Code\CISC320\Project\build\src\CMakeFiles\cleanshare_app_autogen.dir\AutoRcc_Logo_YCDLW3T4OG_Info.json;D:\Code\CISC320\Project\CleanShareLogo.ico;C:\Qt\6.10.0\msvc2022_64\bin\rcc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\YCDLW3T4OG_MinSizeRel\qrc_Logo.cpp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</BuildInParallel>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Automatic RCC for ../Logo.qrc</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd D:\Code\CISC320\Project\build\src
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E cmake_autorcc D:/Code/CISC320/Project/build/src/CMakeFiles/cleanshare_app_autogen.dir/AutoRcc_Logo_YCDLW3T4OG_Info.json RelWithDebInfo
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Code\CISC320\Project\Logo.qrc;D:\Code\CISC320\Project\build\src\CMakeFiles\cleanshare_app_autogen.dir\AutoRcc_Logo_YCDLW3T4OG_Info.json;D:\Code\CISC320\Project\CleanShareLogo.ico;C:\Qt\6.10.0\msvc2022_64\bin\rcc.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\YCDLW3T4OG_RelWithDebInfo\qrc_Logo.cpp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="D:\Code\CISC320\Project\src\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
@@ -399,7 +476,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Code\CISC320\Project\Logo.qrc;D:\Code\CISC320\Project\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Code\CISC320\Project\build\src\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Code/CISC320/Project/src/CMakeLists.txt</Message>
@@ -412,7 +489,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Code\CISC320\Project\Logo.qrc;D:\Code\CISC320\Project\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Code\CISC320\Project\build\src\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/Code/CISC320/Project/src/CMakeLists.txt</Message>
@@ -425,7 +502,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Code\CISC320\Project\Logo.qrc;D:\Code\CISC320\Project\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Code\CISC320\Project\build\src\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/Code/CISC320/Project/src/CMakeLists.txt</Message>
@@ -438,7 +515,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Code\CISC320\Project\Logo.qrc;D:\Code\CISC320\Project\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Code\CISC320\Project\build\src\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
     </CustomBuild>
@@ -450,7 +527,22 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="D:\Code\CISC320\Project\src\main.cpp" />
+    <None Include="D:\Code\CISC320\Project\Logo.qrc">
+    </None>
+    <ResourceCompile Include="D:\Code\CISC320\Project\appicon.rc" />
+    <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\YCDLW3T4OG_Debug\qrc_Logo.cpp">
+      <ObjectFileName>$(IntDir)/cleanshare_app_autogen/YCDLW3T4OG_Debug/qrc_Logo.cpp.obj</ObjectFileName>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\mocs_compilation_Release.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\YCDLW3T4OG_Release\qrc_Logo.cpp">
+      <ObjectFileName>$(IntDir)/cleanshare_app_autogen/YCDLW3T4OG_Release/qrc_Logo.cpp.obj</ObjectFileName>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ExcludedFromBuild>
@@ -460,7 +552,19 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\YCDLW3T4OG_MinSizeRel\qrc_Logo.cpp">
+      <ObjectFileName>$(IntDir)/cleanshare_app_autogen/YCDLW3T4OG_MinSizeRel/qrc_Logo.cpp.obj</ObjectFileName>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\mocs_compilation_RelWithDebInfo.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\YCDLW3T4OG_RelWithDebInfo\qrc_Logo.cpp">
+      <ObjectFileName>$(IntDir)/cleanshare_app_autogen/YCDLW3T4OG_RelWithDebInfo/qrc_Logo.cpp.obj</ObjectFileName>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ExcludedFromBuild>
@@ -474,7 +578,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="D:\Code\CISC320\Project\build\src\cleanshare_core.vcxproj">
+    <ProjectReference Include="D:\Code\CISC320\Project\build\src\core\cleanshare_core.vcxproj">
       <Project>{682CE6F8-9A86-3509-85C4-EF635FCB3EDE}</Project>
       <Name>cleanshare_core</Name>
     </ProjectReference>

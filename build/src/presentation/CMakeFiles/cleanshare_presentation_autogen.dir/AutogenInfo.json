@@ -13,6 +13,12 @@
 	"HEADERS" : 
 	[
 		[
+			"D:/Code/CISC320/Project/src/presentation/include/ImageCanvas.h",
+			"MU",
+			"6YEA5652QU/moc_ImageCanvas.cpp",
+			null
+		],
+		[
 			"D:/Code/CISC320/Project/src/presentation/include/ImagePreviewWidget.h",
 			"MU",
 			"6YEA5652QU/moc_ImagePreviewWidget.cpp",
@@ -99,38 +105,46 @@
 	"MOC_INCLUDES_Debug" : 
 	[
 		"D:/Code/CISC320/Project/src/presentation/include",
-		"C:/Qt/6.10.0/msvc2022_64/include/QtWidgets",
-		"C:/Qt/6.10.0/msvc2022_64/include",
+		"D:/Code/CISC320/Project/src/core/include",
+		"D:/Code/CISC320/Project/src/core/include",
 		"C:/Qt/6.10.0/msvc2022_64/include/QtCore",
+		"C:/Qt/6.10.0/msvc2022_64/include",
 		"C:/Qt/6.10.0/msvc2022_64/mkspecs/win32-msvc",
-		"C:/Qt/6.10.0/msvc2022_64/include/QtGui"
+		"C:/Qt/6.10.0/msvc2022_64/include/QtGui",
+		"C:/Qt/6.10.0/msvc2022_64/include/QtWidgets"
 	],
 	"MOC_INCLUDES_MinSizeRel" : 
 	[
 		"D:/Code/CISC320/Project/src/presentation/include",
-		"C:/Qt/6.10.0/msvc2022_64/include/QtWidgets",
-		"C:/Qt/6.10.0/msvc2022_64/include",
+		"D:/Code/CISC320/Project/src/core/include",
+		"D:/Code/CISC320/Project/src/core/include",
 		"C:/Qt/6.10.0/msvc2022_64/include/QtCore",
+		"C:/Qt/6.10.0/msvc2022_64/include",
 		"C:/Qt/6.10.0/msvc2022_64/mkspecs/win32-msvc",
-		"C:/Qt/6.10.0/msvc2022_64/include/QtGui"
+		"C:/Qt/6.10.0/msvc2022_64/include/QtGui",
+		"C:/Qt/6.10.0/msvc2022_64/include/QtWidgets"
 	],
 	"MOC_INCLUDES_RelWithDebInfo" : 
 	[
 		"D:/Code/CISC320/Project/src/presentation/include",
-		"C:/Qt/6.10.0/msvc2022_64/include/QtWidgets",
-		"C:/Qt/6.10.0/msvc2022_64/include",
+		"D:/Code/CISC320/Project/src/core/include",
+		"D:/Code/CISC320/Project/src/core/include",
 		"C:/Qt/6.10.0/msvc2022_64/include/QtCore",
+		"C:/Qt/6.10.0/msvc2022_64/include",
 		"C:/Qt/6.10.0/msvc2022_64/mkspecs/win32-msvc",
-		"C:/Qt/6.10.0/msvc2022_64/include/QtGui"
+		"C:/Qt/6.10.0/msvc2022_64/include/QtGui",
+		"C:/Qt/6.10.0/msvc2022_64/include/QtWidgets"
 	],
 	"MOC_INCLUDES_Release" : 
 	[
 		"D:/Code/CISC320/Project/src/presentation/include",
-		"C:/Qt/6.10.0/msvc2022_64/include/QtWidgets",
-		"C:/Qt/6.10.0/msvc2022_64/include",
+		"D:/Code/CISC320/Project/src/core/include",
+		"D:/Code/CISC320/Project/src/core/include",
 		"C:/Qt/6.10.0/msvc2022_64/include/QtCore",
+		"C:/Qt/6.10.0/msvc2022_64/include",
 		"C:/Qt/6.10.0/msvc2022_64/mkspecs/win32-msvc",
-		"C:/Qt/6.10.0/msvc2022_64/include/QtGui"
+		"C:/Qt/6.10.0/msvc2022_64/include/QtGui",
+		"C:/Qt/6.10.0/msvc2022_64/include/QtWidgets"
 	],
 	"MOC_MACRO_NAMES" : 
 	[
@@ -173,6 +187,11 @@
 	"SETTINGS_FILE_Release" : "D:/Code/CISC320/Project/build/src/presentation/CMakeFiles/cleanshare_presentation_autogen.dir/AutogenUsed_Release.txt",
 	"SOURCES" : 
 	[
+		[
+			"D:/Code/CISC320/Project/src/presentation/src/ImageCanvas.cpp",
+			"MU",
+			null
+		],
 		[
 			"D:/Code/CISC320/Project/src/presentation/src/ImagePreviewWidget.cpp",
 			"MU",

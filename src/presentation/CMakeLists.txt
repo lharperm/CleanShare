@@ -1,14 +1,17 @@
-set(PRESENTATION_SOURCES
-        src/MainWindow.cpp
-        src/ImagePreviewWidget.cpp
+# Presentation / GUI library: MainWindow, widgets, etc.
+
+file(GLOB_RECURSE PRESENTATION_SOURCES CONFIGURE_DEPENDS
+        src/*.cpp
+        src/*.cc
+        src/*.cxx
 )
 
-set(PRESENTATION_HEADERS
-        include/MainWindow.h
-        include/ImagePreviewWidget.h
+file(GLOB_RECURSE PRESENTATION_HEADERS CONFIGURE_DEPENDS
+        include/*.h
+        include/*.hpp
 )
 
-add_library(cleanshare_presentation
+add_library(cleanshare_presentation STATIC
         ${PRESENTATION_SOURCES}
         ${PRESENTATION_HEADERS}
 )
@@ -16,8 +19,13 @@ add_library(cleanshare_presentation
 target_include_directories(cleanshare_presentation
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/../core/include
 )
 
 target_link_libraries(cleanshare_presentation
-        PUBLIC Qt6::Widgets
+        PUBLIC
+        cleanshare_core
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
 )

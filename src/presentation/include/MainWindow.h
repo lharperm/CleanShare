@@ -1,38 +1,65 @@
-#pragma once
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include "SessionController.h"
 
 #include <QMainWindow>
+#include <QStackedWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QSlider>
+#include <QString>
+#include <QPixmap>
 
-class ImagePreviewWidget;
+class ImageCanvas;  // forward declaration
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
+
 public:
-    explicit MainWindow(QWidget* parent = nullptr);
-    ~MainWindow() override = default;
-
-signals:
-    void importImageRequested();
-    void runDetectionRequested();
-    void exportImageRequested();
-    void importImageFromPathRequested(const QString& path);
-
-public slots:
-    void onImageUpdated(const QImage& original, const QImage& redactedPreview);
-    void showStatusMessage(const QString& msg);
-    void handleImageFileDropped(const QString& path);
+    explicit MainWindow(QWidget *parent = nullptr);
 
 private slots:
-    void handleImportTriggered();
-    void handleDetectTriggered();
-    void handleExportTriggered();
+    void onUploadClicked();
+    void onDetectClicked();
+    void onBlurSliderChanged(int);
+    void onExportClicked();
+    void onManualEditClicked();
 
 private:
-    void createActions();
-    void createToolbar();
-    void createCentralPane();
+    void createHomePage();
+    void createPreviewPage();
+    void showImageInPanels();
+    void updatePreviewLabels();
+    void applyFakeBlur(int strength);   // calls into SessionController
 
-    ImagePreviewWidget* m_previewWidget = nullptr;
-    QAction* m_importAction = nullptr;
-    QAction* m_detectAction = nullptr;
-    QAction* m_exportAction = nullptr;
+    QStackedWidget *m_pages;
+
+    // Home page
+    QWidget *m_homePage;
+    QPushButton *m_uploadButton;
+    QLabel *m_infoLabel;
+
+    // Preview / Edit page
+    QWidget *m_previewPage;
+    QLabel *m_originalImageLabel;
+    ImageCanvas *m_blurredImageCanvas;
+
+    QPushButton *m_detectButton;
+    QPushButton *m_manualEditButton;
+    QPushButton *m_exportButton;
+    QPushButton *m_undoButton;
+    QPushButton *m_redoButton;
+    QSlider     *m_blurSlider;
+
+    QString m_currentImagePath;
+    QPixmap m_originalPixmap;
+    QPixmap m_blurredPixmap;
+
+    SessionController m_session;
+
+    bool m_manualEditEnabled;
 };
+
+#endif // MAINWINDOW_H

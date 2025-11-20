@@ -1,3 +1,17 @@
+^D:\CODE\CISC320\PROJECT\BUILD\CMAKEFILES\161792348F8F62D5C28652EB52B0E140\QRC_LOGO.CPP.RULE
+setlocal
+cd D:\Code\CISC320\Project\build\src
+if %errorlevel% neq 0 goto :cmEnd
+D:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E cmake_autorcc D:/Code/CISC320/Project/build/src/CMakeFiles/cleanshare_app_autogen.dir/AutoRcc_Logo_YCDLW3T4OG_Info.json Release
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
 ^D:\CODE\CISC320\PROJECT\SRC\CMAKELISTS.TXT
 setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -SD:/Code/CISC320/Project -BD:/Code/CISC320/Project/build --check-stamp-file D:/Code/CISC320/Project/build/src/CMakeFiles/generate.stamp

@@ -4,10 +4,13 @@
     <ClCompile Include="D:\Code\CISC320\Project\build\src\presentation\cleanshare_presentation_autogen\mocs_compilation_Debug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Code\CISC320\Project\src\presentation\src\MainWindow.cpp">
+    <ClCompile Include="D:\Code\CISC320\Project\src\presentation\src\ImageCanvas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D:\Code\CISC320\Project\src\presentation\src\ImagePreviewWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\CISC320\Project\src\presentation\src\MainWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D:\Code\CISC320\Project\build\src\presentation\cleanshare_presentation_autogen\mocs_compilation_Release.cpp">
@@ -21,10 +24,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="D:\Code\CISC320\Project\src\presentation\include\MainWindow.h">
+    <ClInclude Include="D:\Code\CISC320\Project\src\presentation\include\ImageCanvas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D:\Code\CISC320\Project\src\presentation\include\ImagePreviewWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Code\CISC320\Project\src\presentation\include\MainWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

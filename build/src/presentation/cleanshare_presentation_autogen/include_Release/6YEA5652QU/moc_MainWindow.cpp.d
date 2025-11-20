@@ -1,4 +1,5 @@
 D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/include_Release/6YEA5652QU/moc_MainWindow.cpp: D:/Code/CISC320/Project/src/presentation/include/MainWindow.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtCore/QString \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/q17memory.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/q20functional.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/q20iterator.h \
@@ -48,6 +49,7 @@ D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/i
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qglobalstatic.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qhash.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qhashfunctions.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qiodevice.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qiodevicebase.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qiterable.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qiterator.h \
@@ -120,12 +122,14 @@ D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/i
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qtversionchecks.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qtypeinfo.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qtypes.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qurl.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qutf8stringview.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qvariant.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qvarlengtharray.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qversiontagging.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qxptype_traits.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qyieldcpu.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtGui/QPixmap \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qaction.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qbitmap.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qbrush.h \
@@ -140,23 +144,37 @@ D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/i
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qkeysequence.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qpaintdevice.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qpalette.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qpicture.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qpixelformat.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qpixmap.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qpolygon.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qregion.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qrgb.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qrgba64.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qtextdocument.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qtgui-config.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qtguiexports.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qtguiglobal.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qtransform.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qwindowdefs.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qwindowdefs_win.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/QLabel \
   C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/QMainWindow \
+  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/QPushButton \
+  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/QSlider \
+  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/QStackedWidget \
+  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qabstractbutton.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qabstractslider.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qframe.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qlabel.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qmainwindow.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qpushbutton.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qsizepolicy.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qslider.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qstackedwidget.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qtabwidget.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qtwidgets-config.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qtwidgetsexports.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qtwidgetsglobal.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qwidget.h
+  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qwidget.h \
+  D:/Code/CISC320/Project/src/core/include/SessionController.h

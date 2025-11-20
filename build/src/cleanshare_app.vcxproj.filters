@@ -7,20 +7,46 @@
     <ClCompile Include="D:\Code\CISC320\Project\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\YCDLW3T4OG_Debug\qrc_Logo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\mocs_compilation_Release.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\YCDLW3T4OG_Release\qrc_Logo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\mocs_compilation_MinSizeRel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\YCDLW3T4OG_MinSizeRel\qrc_Logo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\mocs_compilation_RelWithDebInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Code\CISC320\Project\build\src\cleanshare_app_autogen\YCDLW3T4OG_RelWithDebInfo\qrc_Logo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="D:\Code\CISC320\Project\build\CMakeFiles\161792348f8f62d5c28652eb52b0e140\qrc_Logo.cpp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
     <CustomBuild Include="D:\Code\CISC320\Project\src\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="D:\Code\CISC320\Project\Logo.qrc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="D:\Code\CISC320\Project\appicon.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{4535D36F-3D37-37B3-81DB-004F5EC47BC2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{CADA7A60-8F20-386E-A07B-B951FA5335B1}</UniqueIdentifier>
     </Filter>

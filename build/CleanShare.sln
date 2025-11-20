@@ -20,7 +20,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cleanshare_app", "src\clean
 		{DD286728-50F7-39EC-9ED1-A39D3920CBA1} = {DD286728-50F7-39EC-9ED1-A39D3920CBA1}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cleanshare_core", "src\cleanshare_core.vcxproj", "{682CE6F8-9A86-3509-85C4-EF635FCB3EDE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cleanshare_core", "src\core\cleanshare_core.vcxproj", "{682CE6F8-9A86-3509-85C4-EF635FCB3EDE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BCEE4191-58F6-319E-94AC-ED6F9A2619FA} = {BCEE4191-58F6-319E-94AC-ED6F9A2619FA}
 	EndProjectSection
@@ -28,6 +28,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cleanshare_presentation", "src\presentation\cleanshare_presentation.vcxproj", "{DD286728-50F7-39EC-9ED1-A39D3920CBA1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BCEE4191-58F6-319E-94AC-ED6F9A2619FA} = {BCEE4191-58F6-319E-94AC-ED6F9A2619FA}
+		{682CE6F8-9A86-3509-85C4-EF635FCB3EDE} = {682CE6F8-9A86-3509-85C4-EF635FCB3EDE}
 	EndProjectSection
 EndProject
 Global
