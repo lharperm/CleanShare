@@ -200,6 +200,12 @@ void MainWindow::createPreviewPage()
     connect(m_manualEditButton, &QPushButton::clicked,
             this, &MainWindow::onManualEditClicked);
 
+    connect(m_undoButton, &QPushButton::clicked,
+        this, &MainWindow::onUndoClicked);
+
+    connect(m_redoButton, &QPushButton::clicked,
+        this, &MainWindow::onRedoClicked);
+
     m_pages->addWidget(m_previewPage);
 }
 
@@ -336,3 +342,18 @@ void MainWindow::onManualEditClicked()
         m_manualEditEnabled ? "Manual Edit: On" : "Manual Edit: Off"
         );
 }
+
+void MainWindow::onUndoClicked()
+{
+    m_session.undo();
+    m_blurredPixmap = m_session.blurredPixmap();
+    updatePreviewLabels();
+}
+
+void MainWindow::onRedoClicked()
+{
+    m_session.redo();
+    m_blurredPixmap = m_session.blurredPixmap();
+    updatePreviewLabels();
+}
+

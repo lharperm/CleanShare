@@ -26,6 +26,8 @@ private slots:
     void onBlurSliderChanged(int);
     void onExportClicked();
     void onManualEditClicked();
+    void onUndoClicked();
+    void onRedoClicked();
 
 private:
     void createHomePage();

@@ -1,0 +1,14 @@
+build/
+*.user
+*.autosave
+CMakeCache.txt
+CMakeFiles/
+*.a
+*.o
+*.obj
+*.pdb
+*.exe
+*.dll
+*.lib
+*.ninja
+*.ninja_log

@@ -21,10 +21,19 @@ public:
 
     const QString &currentImagePath() const { return m_currentImagePath; }
 
+    void undo();
+    void redo();
+    void pushState();
+
+    
+
 private:
     QString m_currentImagePath;
     QPixmap m_original;
     QPixmap m_blurred;
+
+    QVector<QPixmap> m_undoStack;
+    QVector<QPixmap> m_redoStack;
 };
 
 #endif // SESSIONCONTROLLER_H
