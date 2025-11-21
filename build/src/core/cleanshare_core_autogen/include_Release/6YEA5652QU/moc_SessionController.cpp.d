@@ -1,5 +1,7 @@
-D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/include_Release/6YEA5652QU/moc_ImageCanvas.cpp: D:/Code/CISC320/Project/src/presentation/include/ImageCanvas.h \
+D:/Code/CISC320/Project/build/src/core/cleanshare_core_autogen/include_Release/6YEA5652QU/moc_SessionController.cpp: D:/Code/CISC320/Project/src/core/include/SessionController.h \
+  C:/Qt/6.10.0/msvc2022_64/include/QtCore/QObject \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/QRect \
+  C:/Qt/6.10.0/msvc2022_64/include/QtCore/QString \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/QVector \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/q17memory.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/q20functional.h \
@@ -9,7 +11,6 @@ D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/i
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/q20utility.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/q23utility.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qalgorithms.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qalloc.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qanystringview.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qarraydata.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qarraydataops.h \
@@ -34,11 +35,8 @@ D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/i
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qcontainerfwd.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qcontainerinfo.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qcontainertools_impl.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qcontiguouscache.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qdarwinhelpers.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qdatastream.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qdebug.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qendian.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qexceptionhandling.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qflags.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qfloat16.h \
@@ -48,7 +46,6 @@ D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/i
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qgenericatomic.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qglobal.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qglobalstatic.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qhash.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qhashfunctions.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qiodevicebase.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qiterable.h \
@@ -58,7 +55,6 @@ D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/i
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qlist.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qlogging.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qmalloc.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qmap.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qmargins.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qmath.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qmetacontainer.h \
@@ -78,11 +74,7 @@ D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/i
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qrefcount.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qscopedpointer.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qscopeguard.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qset.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qshareddata.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qshareddata_impl.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qsharedpointer.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qsharedpointer_impl.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qsize.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qspan.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qstdlibdetection.h \
@@ -110,7 +102,6 @@ D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/i
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qtdeprecationdefinitions.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qtdeprecationmarkers.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qtenvironmentvariables.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qtextstream.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qtformat_impl.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qtmetamacros.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qtnoop.h \
@@ -123,30 +114,15 @@ D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/i
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qtypeinfo.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qtypes.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qutf8stringview.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qvariant.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtCore/qvarlengtharray.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qvector.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qversiontagging.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qxptype_traits.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtCore/qyieldcpu.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/QImage \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/QPainterPath \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/QPixmap \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qaction.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qbitmap.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qbrush.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qcolor.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qcursor.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qfont.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qfontinfo.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qfontmetrics.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qfontvariableaxis.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qicon.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qimage.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qkeysequence.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qpaintdevice.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qpainterpath.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qpalette.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qpixelformat.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qpixmap.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qpolygon.h \
@@ -158,10 +134,4 @@ D:/Code/CISC320/Project/build/src/presentation/cleanshare_presentation_autogen/i
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qtguiglobal.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qtransform.h \
   C:/Qt/6.10.0/msvc2022_64/include/QtGui/qwindowdefs.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qwindowdefs_win.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/QWidget \
-  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qsizepolicy.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qtwidgets-config.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qtwidgetsexports.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qtwidgetsglobal.h \
-  C:/Qt/6.10.0/msvc2022_64/include/QtWidgets/qwidget.h
+  C:/Qt/6.10.0/msvc2022_64/include/QtGui/qwindowdefs_win.h

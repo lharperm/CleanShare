@@ -17,6 +17,9 @@
 #include <QToolButton>
 #include <QButtonGroup>
 #include <QSpinBox>
+#include <QSlider>          
+#include <QMimeData>        
+#include <QUrl>             
 #include <QtConcurrent/QtConcurrentRun>
 #include <QFuture>
 #include <QFutureWatcher>
@@ -29,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_uploadButton(nullptr)
     , m_infoLabel(nullptr)
     , m_previewPage(nullptr)
+
     , m_originalImageLabel(nullptr)
     , m_blurredImageCanvas(nullptr)
     , m_detectButton(nullptr)
@@ -47,9 +51,13 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setAcceptDrops(true);
     
-    // Create both pages
+    // Create both pages once
     createHomePage();
     createPreviewPage();
+
+    // Connect detection outlines from the session to the blurred canvas
+    connect(&m_session, &SessionController::detectionsUpdated,
+            this, &MainWindow::onDetectionsUpdated);
 
     // Start on the home page
     m_pages->setCurrentWidget(m_homePage);
@@ -74,25 +82,25 @@ MainWindow::MainWindow(QWidget *parent)
         tosText,
         QMessageBox::Yes | QMessageBox::No,
         QMessageBox::No
-        );
+    );
 
     if (reply != QMessageBox::Yes) {
         QTimer::singleShot(0, this, &QWidget::close);
     }
 
     setStyleSheet(
-    "QWidget#DropArea {"
-    "    border: 2px dashed #999999;"
-    "    border-radius: 12px;"
-    "    background-color: rgba(0, 0, 0, 10);"
-    "}"
-    "QWidget#DropArea:hover {"
-    "    border-color: #0078d4;"
-    "    background-color: rgba(0, 120, 212, 15);"
-    "}"
-);
-
+        "QWidget#DropArea {"
+        "    border: 2px dashed #999999;"
+        "    border-radius: 12px;"
+        "    background-color: rgba(0, 0, 0, 10);"
+        "}"
+        "QWidget#DropArea:hover {"
+        "    border-color: #0078d4;"
+        "    background-color: rgba(0, 120, 212, 15);"
+        "}"
+    );
 }
+
 
 // ---------------- Home page ----------------
 
@@ -174,7 +182,10 @@ void MainWindow::onUploadClicked()
 
     // Show the controller's pixmaps in both panels
     // Clear any previous selection because this is a new image
-    if (m_blurredImageCanvas) m_blurredImageCanvas->clearSelection();
+     if (m_blurredImageCanvas) {
+        m_blurredImageCanvas->clearSelection();
+        m_blurredImageCanvas->clearDetectionBoxes();
+    }
     showImageInPanels();
 
     // Switch to preview page
@@ -188,7 +199,7 @@ void MainWindow::createPreviewPage()
     m_previewPage = new QWidget(this);
 
     // --- Top toolbar area (buttons + slider) ---
-    m_detectButton      = new QPushButton("Detect & Blur", this);
+    m_detectButton      = new QPushButton("Detect", this);
     m_manualEditButton  = new QPushButton("Manual Edit: Off", this);
     m_exportButton      = new QPushButton("Export", this);
     m_undoButton        = new QPushButton("Undo", this);
@@ -358,8 +369,8 @@ void MainWindow::updatePreviewLabels()
     m_blurredImageCanvas->setImage(m_blurredPixmap);
 }
 
-// ---------------- Blur logic (dummy) ----------------
 
+// ---------------- Blur logic (wrapper) ----------------
 void MainWindow::applyFakeBlur(int strength)
 {
     if (!m_session.hasImage())
@@ -379,33 +390,34 @@ void MainWindow::onBlurDebounceTimeout()
     if (!m_session.hasImage())
         return;
 
-    // Start background job to compute full-size blur so UI stays responsive.
     int strength = m_pendingBlurValue;
-    m_lastBlurJobStrength = strength;
 
-    // Record undo state before starting background computation
+    // Save undo state before applying blur
     m_session.pushState();
 
     // If the user has an active selection, only blur that selection.
     QImage selMask;
-    if (m_blurredImageCanvas) selMask = m_blurredImageCanvas->selectionMask();
+    if (m_blurredImageCanvas)
+        selMask = m_blurredImageCanvas->selectionMask();
 
     if (!selMask.isNull()) {
         // Selection exists -> run masked blur
-        QFuture<QPixmap> fut = QtConcurrent::run([sessionCopy = m_session, strength, selMask]() mutable -> QPixmap {
-            sessionCopy.applyFakeBlur(strength, selMask);
-            return sessionCopy.blurredPixmap();
-        });
-        m_blurWatcher->setFuture(fut);
+        m_session.applyFakeBlur(strength, selMask);
     } else {
-        // No selection -> full-image blur
-        QFuture<QPixmap> fut = QtConcurrent::run([sessionCopy = m_session, strength]() mutable -> QPixmap {
-            sessionCopy.applyFakeBlur(strength);
-            return sessionCopy.blurredPixmap();
-        });
-        m_blurWatcher->setFuture(fut);
+        // No selection -> blur using current cumulative mask (AI mask / manual mask)
+        m_session.applyFakeBlur(strength);
     }
+
+    // Refresh local pixmaps from session
+    m_originalPixmap = m_session.originalPixmap();
+    m_blurredPixmap  = m_session.blurredPixmap();
+    updatePreviewLabels();
+
+    // Ensure slider is enabled after first blur
+    if (!m_blurSlider->isEnabled())
+        m_blurSlider->setEnabled(true);
 }
+
 
 
 
@@ -422,10 +434,12 @@ void MainWindow::onDetectClicked()
 
     const int strength = m_blurSlider->value();
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QApplication::setOverrideCursor(Qt::WaitCursor);  // or QGuiApplication, both fine
+
     QString error;
     bool ok = m_session.autoBlurWithPythonDetections(strength, &error);
-    QApplication::restoreOverrideCursor();
+
+    QApplication::restoreOverrideCursor();            // *** CALL, not definition ***
 
     if (!ok) {
         if (error.isEmpty()) {
@@ -439,14 +453,20 @@ void MainWindow::onDetectClicked()
         return;
     }
 
-    // We just modified the session's blurred image; refresh the preview
     showImageInPanels();
 
-    // Ensure slider is enabled now that some blur exists
     if (!m_blurSlider->isEnabled())
         m_blurSlider->setEnabled(true);
 }
 
+
+void MainWindow::onDetectionsUpdated(const QVector<QRect> &boxes)
+{
+    // Draw outlines only on the AFTER image canvas
+    if (m_blurredImageCanvas) {
+        m_blurredImageCanvas->setDetectionBoxes(boxes);
+    }
+}
 
 void MainWindow::onBackgroundBlurFinished()
 {
@@ -460,7 +480,9 @@ void MainWindow::onBackgroundBlurFinished()
     m_originalPixmap = m_session.originalPixmap();
     m_blurredPixmap = m_session.blurredPixmap();
     updatePreviewLabels();
-
+    if (m_blurredImageCanvas) {
+        m_blurredImageCanvas->setExistingMask(m_session.cumulativeMask());
+    }
     // Ensure slider is enabled after first blur
     if (!m_blurSlider->isEnabled())
         m_blurSlider->setEnabled(true);
@@ -582,7 +604,7 @@ void MainWindow::onExportClicked()
             this,
             "Nothing to export",
             "There is no blurred image to export yet.\n\n"
-            "Try clicking \"Detect & Blur\" first."
+            "Try clicking \"Detect\" and adjusting the blur slider first."
             );
         return;
     }
@@ -653,27 +675,21 @@ void MainWindow::onSelectionChanged(const QImage &mask)
     if (!m_session.hasImage())
         return;
 
-    // Run selection-based blur/remove in background to avoid UI blocking
     int strength = m_blurSlider->value();
-    m_lastBlurJobStrength = strength;
+
+    // Save undo state
+    m_session.pushState();
 
     if (m_lastSelectionWasAddMode) {
-        // Save undo state for manual selection operation
-        m_session.pushState();
-        QFuture<QPixmap> fut = QtConcurrent::run([sessionCopy = m_session, strength, mask]() mutable -> QPixmap {
-            sessionCopy.applyFakeBlur(strength, mask);
-            return sessionCopy.blurredPixmap();
-        });
-        m_blurWatcher->setFuture(fut);
+        m_session.applyFakeBlur(strength, mask);
     } else {
-        // Save undo state for removal as well
-        m_session.pushState();
-        QFuture<QPixmap> fut = QtConcurrent::run([sessionCopy = m_session, mask]() mutable -> QPixmap {
-            sessionCopy.removeBlur(mask);
-            return sessionCopy.blurredPixmap();
-        });
-        m_blurWatcher->setFuture(fut);
+        m_session.removeBlur(mask);
     }
+
+    // Update from session
+    m_originalPixmap = m_session.originalPixmap();
+    m_blurredPixmap  = m_session.blurredPixmap();
+    updatePreviewLabels();
 
     // Enable slider after first blur operation
     if (!m_blurSlider->isEnabled())
@@ -774,11 +790,16 @@ void MainWindow::dropEvent(QDropEvent *event)
         return;
     }
 
-    m_currentImagePath = imagePath;
+     m_currentImagePath = imagePath;
     m_originalPixmap   = m_session.originalPixmap();
     m_blurredPixmap    = m_session.blurredPixmap();
-    // Clear selection because this is a newly loaded image from drop
-    if (m_blurredImageCanvas) m_blurredImageCanvas->clearSelection();
+
+    // Clear selection and old detection boxes because this is a new image
+    if (m_blurredImageCanvas) {
+        m_blurredImageCanvas->clearSelection();
+        m_blurredImageCanvas->clearDetectionBoxes();
+    }
+
     updatePreviewLabels();
     m_infoLabel->setText(QFileInfo(imagePath).fileName());
     m_pages->setCurrentWidget(m_previewPage);

@@ -7,8 +7,8 @@
 *****************************************************************************/
 
 #include "../../../../../../src/presentation/include/MainWindow.h"
-#include <QtGui/qtextcursor.h>
 #include <QtCore/qmetatype.h>
+#include <QtCore/QList>
 
 #include <QtCore/qtmochelpers.h>
 
@@ -43,9 +43,18 @@ template <> constexpr inline auto MainWindow::qt_create_metaobjectdata<qt_meta_t
         "onUploadClicked",
         "",
         "onDetectClicked",
+        "onDetectionsUpdated",
+        "QList<QRect>",
+        "boxes",
         "onBlurSliderChanged",
+        "value",
+        "onBlurSpinChanged",
         "onBlurDebounceTimeout",
         "onBackgroundBlurFinished",
+        "onSelectReplaceClicked",
+        "checked",
+        "onSelectAddClicked",
+        "onSelectSubtractClicked",
         "onExportClicked",
         "onManualEditClicked",
         "onUndoClicked",
@@ -55,13 +64,7 @@ template <> constexpr inline auto MainWindow::qt_create_metaobjectdata<qt_meta_t
         "mask",
         "onSelectionModeChanged",
         "addMode",
-        "replaceMode",
-        "onSelectReplaceClicked",
-        "checked",
-        "onSelectAddClicked",
-        "onSelectSubtractClicked",
-        "onBlurSpinChanged",
-        "value"
+        "replaceMode"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -69,45 +72,49 @@ template <> constexpr inline auto MainWindow::qt_create_metaobjectdata<qt_meta_t
         QtMocHelpers::SlotData<void()>(1, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'onDetectClicked'
         QtMocHelpers::SlotData<void()>(3, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onDetectionsUpdated'
+        QtMocHelpers::SlotData<void(const QVector<QRect> &)>(4, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 5, 6 },
+        }}),
         // Slot 'onBlurSliderChanged'
-        QtMocHelpers::SlotData<void(int)>(4, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { QMetaType::Int, 2 },
-        }}),
-        // Slot 'onBlurDebounceTimeout'
-        QtMocHelpers::SlotData<void()>(5, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onBackgroundBlurFinished'
-        QtMocHelpers::SlotData<void()>(6, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onExportClicked'
-        QtMocHelpers::SlotData<void()>(7, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onManualEditClicked'
-        QtMocHelpers::SlotData<void()>(8, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onUndoClicked'
-        QtMocHelpers::SlotData<void()>(9, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onRedoClicked'
-        QtMocHelpers::SlotData<void()>(10, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onSelectionChanged'
-        QtMocHelpers::SlotData<void(const QImage &)>(11, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { 0x80000000 | 12, 13 },
-        }}),
-        // Slot 'onSelectionModeChanged'
-        QtMocHelpers::SlotData<void(bool, bool)>(14, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { QMetaType::Bool, 15 }, { QMetaType::Bool, 16 },
-        }}),
-        // Slot 'onSelectReplaceClicked'
-        QtMocHelpers::SlotData<void(bool)>(17, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { QMetaType::Bool, 18 },
-        }}),
-        // Slot 'onSelectAddClicked'
-        QtMocHelpers::SlotData<void(bool)>(19, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { QMetaType::Bool, 18 },
-        }}),
-        // Slot 'onSelectSubtractClicked'
-        QtMocHelpers::SlotData<void(bool)>(20, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { QMetaType::Bool, 18 },
+        QtMocHelpers::SlotData<void(int)>(7, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Int, 8 },
         }}),
         // Slot 'onBlurSpinChanged'
-        QtMocHelpers::SlotData<void(int)>(21, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { QMetaType::Int, 22 },
+        QtMocHelpers::SlotData<void(int)>(9, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Int, 8 },
+        }}),
+        // Slot 'onBlurDebounceTimeout'
+        QtMocHelpers::SlotData<void()>(10, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onBackgroundBlurFinished'
+        QtMocHelpers::SlotData<void()>(11, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onSelectReplaceClicked'
+        QtMocHelpers::SlotData<void(bool)>(12, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Bool, 13 },
+        }}),
+        // Slot 'onSelectAddClicked'
+        QtMocHelpers::SlotData<void(bool)>(14, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Bool, 13 },
+        }}),
+        // Slot 'onSelectSubtractClicked'
+        QtMocHelpers::SlotData<void(bool)>(15, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Bool, 13 },
+        }}),
+        // Slot 'onExportClicked'
+        QtMocHelpers::SlotData<void()>(16, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onManualEditClicked'
+        QtMocHelpers::SlotData<void()>(17, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onUndoClicked'
+        QtMocHelpers::SlotData<void()>(18, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onRedoClicked'
+        QtMocHelpers::SlotData<void()>(19, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onSelectionChanged'
+        QtMocHelpers::SlotData<void(const QImage &)>(20, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 21, 22 },
+        }}),
+        // Slot 'onSelectionModeChanged'
+        QtMocHelpers::SlotData<void(bool, bool)>(23, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Bool, 24 }, { QMetaType::Bool, 25 },
         }}),
     };
     QtMocHelpers::UintData qt_properties {
@@ -134,19 +141,20 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         switch (_id) {
         case 0: _t->onUploadClicked(); break;
         case 1: _t->onDetectClicked(); break;
-        case 2: _t->onBlurSliderChanged((*reinterpret_cast<std::add_pointer_t<int>>(_a[1]))); break;
-        case 3: _t->onBlurDebounceTimeout(); break;
-        case 4: _t->onBackgroundBlurFinished(); break;
-        case 5: _t->onExportClicked(); break;
-        case 6: _t->onManualEditClicked(); break;
-        case 7: _t->onUndoClicked(); break;
-        case 8: _t->onRedoClicked(); break;
-        case 9: _t->onSelectionChanged((*reinterpret_cast<std::add_pointer_t<QImage>>(_a[1]))); break;
-        case 10: _t->onSelectionModeChanged((*reinterpret_cast<std::add_pointer_t<bool>>(_a[1])),(*reinterpret_cast<std::add_pointer_t<bool>>(_a[2]))); break;
-        case 11: _t->onSelectReplaceClicked((*reinterpret_cast<std::add_pointer_t<bool>>(_a[1]))); break;
-        case 12: _t->onSelectAddClicked((*reinterpret_cast<std::add_pointer_t<bool>>(_a[1]))); break;
-        case 13: _t->onSelectSubtractClicked((*reinterpret_cast<std::add_pointer_t<bool>>(_a[1]))); break;
-        case 14: _t->onBlurSpinChanged((*reinterpret_cast<std::add_pointer_t<int>>(_a[1]))); break;
+        case 2: _t->onDetectionsUpdated((*reinterpret_cast<std::add_pointer_t<QList<QRect>>>(_a[1]))); break;
+        case 3: _t->onBlurSliderChanged((*reinterpret_cast<std::add_pointer_t<int>>(_a[1]))); break;
+        case 4: _t->onBlurSpinChanged((*reinterpret_cast<std::add_pointer_t<int>>(_a[1]))); break;
+        case 5: _t->onBlurDebounceTimeout(); break;
+        case 6: _t->onBackgroundBlurFinished(); break;
+        case 7: _t->onSelectReplaceClicked((*reinterpret_cast<std::add_pointer_t<bool>>(_a[1]))); break;
+        case 8: _t->onSelectAddClicked((*reinterpret_cast<std::add_pointer_t<bool>>(_a[1]))); break;
+        case 9: _t->onSelectSubtractClicked((*reinterpret_cast<std::add_pointer_t<bool>>(_a[1]))); break;
+        case 10: _t->onExportClicked(); break;
+        case 11: _t->onManualEditClicked(); break;
+        case 12: _t->onUndoClicked(); break;
+        case 13: _t->onRedoClicked(); break;
+        case 14: _t->onSelectionChanged((*reinterpret_cast<std::add_pointer_t<QImage>>(_a[1]))); break;
+        case 15: _t->onSelectionModeChanged((*reinterpret_cast<std::add_pointer_t<bool>>(_a[1])),(*reinterpret_cast<std::add_pointer_t<bool>>(_a[2]))); break;
         default: ;
         }
     }
@@ -171,14 +179,14 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 15)
+        if (_id < 16)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 15;
+        _id -= 16;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 15)
+        if (_id < 16)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 15;
+        _id -= 16;
     }
     return _id;
 }

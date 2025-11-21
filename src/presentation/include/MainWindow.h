@@ -1,17 +1,28 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QMainWindow>
+#include <QPixmap>
+#include <QRect>
+#include <QVector>
+#include <QFutureWatcher>
+
 #include "SessionController.h"
 
-#include <QMainWindow>
-#include <QStackedWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QSlider>
-#include <QString>
-#include <QPixmap>
+class QStackedWidget;
+class QWidget;
+class QLabel;
+class QPushButton;
+class QToolButton;
+class QSlider;
+class QSpinBox;
+class QTimer;
+class QDragEnterEvent;
+class QDropEvent;
+class QKeyEvent;
+class QImage;
 
-class ImageCanvas;  // forward declaration
+class ImageCanvas;
 
 class MainWindow : public QMainWindow
 {
@@ -20,48 +31,87 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
 
+protected:
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
+
 private slots:
+    // Home page
     void onUploadClicked();
+
+    // Detection & blur
     void onDetectClicked();
-    void onBlurSliderChanged(int);
+    void onDetectionsUpdated(const QVector<QRect> &boxes);
+
+    void onBlurSliderChanged(int value);
+    void onBlurSpinChanged(int value);
+    void onBlurDebounceTimeout();
+    void onBackgroundBlurFinished();
+
+    // Selection mode buttons
+    void onSelectReplaceClicked(bool checked);
+    void onSelectAddClicked(bool checked);
+    void onSelectSubtractClicked(bool checked);
+
+    // Export & manual edit
     void onExportClicked();
     void onManualEditClicked();
     void onUndoClicked();
     void onRedoClicked();
+
+    // Manual selection from canvas
+    void onSelectionChanged(const QImage &mask);
+    void onSelectionModeChanged(bool addMode, bool replaceMode);
 
 private:
     void createHomePage();
     void createPreviewPage();
     void showImageInPanels();
     void updatePreviewLabels();
-    void applyFakeBlur(int strength);   // calls into SessionController
+    void applyFakeBlur(int strength);
 
-    QStackedWidget *m_pages;
+    // Pages
+    QStackedWidget *m_pages = nullptr;
+    QWidget *m_homePage = nullptr;
+    QPushButton *m_uploadButton = nullptr;
+    QLabel *m_infoLabel = nullptr;
+    QWidget *m_previewPage = nullptr;
 
-    // Home page
-    QWidget *m_homePage;
-    QPushButton *m_uploadButton;
-    QLabel *m_infoLabel;
+    // Preview widgets
+    QLabel *m_originalImageLabel = nullptr;
+    ImageCanvas *m_blurredImageCanvas = nullptr;
 
-    // Preview / Edit page
-    QWidget *m_previewPage;
-    QLabel *m_originalImageLabel;
-    ImageCanvas *m_blurredImageCanvas;
+    // Toolbar controls
+    QPushButton *m_detectButton = nullptr;
+    QPushButton *m_manualEditButton = nullptr;
+    QPushButton *m_exportButton = nullptr;
+    QPushButton *m_undoButton = nullptr;
+    QPushButton *m_redoButton = nullptr;
 
-    QPushButton *m_detectButton;
-    QPushButton *m_manualEditButton;
-    QPushButton *m_exportButton;
-    QPushButton *m_undoButton;
-    QPushButton *m_redoButton;
-    QSlider     *m_blurSlider;
+    QToolButton *m_selectReplaceButton = nullptr;
+    QToolButton *m_selectAddButton = nullptr;
+    QToolButton *m_selectSubtractButton = nullptr;
 
+    QSpinBox *m_blurSpinBox = nullptr;
+    QSlider *m_blurSlider = nullptr;
+    QLabel *m_blurValueLabel = nullptr;
+    QTimer *m_blurDebounceTimer = nullptr;
+    QFutureWatcher<QPixmap> *m_blurWatcher = nullptr;
+
+    int  m_pendingBlurValue = 50;
+    bool m_lastSelectionWasAddMode = true;
+    int  m_lastBlurJobStrength = -1;
+    bool m_manualEditEnabled = false;
+
+    // Current image
     QString m_currentImagePath;
     QPixmap m_originalPixmap;
     QPixmap m_blurredPixmap;
 
+    // Core session
     SessionController m_session;
-
-    bool m_manualEditEnabled;
 };
 
 #endif // MAINWINDOW_H

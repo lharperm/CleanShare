@@ -2,6 +2,7 @@
 
 #include <QImage>
 #include <QtMath>
+#include <vector>
 
 
 #include <QCoreApplication>
@@ -15,8 +16,9 @@
 #include <QPainter>
 #include <QDebug>
 
-SessionController::SessionController()
-    : m_currentImagePath()
+SessionController::SessionController(QObject *parent)
+    : QObject(parent)
+    , m_currentImagePath()
     , m_original()
     , m_blurred()
     , m_cumulativeBlurMask()
@@ -36,8 +38,12 @@ bool SessionController::loadImage(const QString &filePath)
     m_original = pix;
     m_blurred  = pix;
     m_cumulativeBlurMask = QImage();  // reset mask on new image
+    m_hasDetectionMask   = false;
+    m_autoBoxes.clear();
     m_cachedBlurStrength = -1;  // invalidate cache
     m_cachedBlurredImage = QPixmap();
+    emit imagesUpdated(m_original, m_blurred);
+    emit detectionsUpdated({}); // clear outlines in the view
     return true;
 }
 
@@ -123,41 +129,76 @@ static QImage boxBlur(const QImage &src, int radius)
     return dst.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 }
 
+
 // PLAY WITH THIS FUNCTION TO ADJUST BLUR STRENGTH/QUALITY! :)
 void SessionController::applyFakeBlur(int strength)
 {
     if (m_original.isNull())
         return;
 
-    // Map slider [0..100] to a Gaussian radius [0..30]
-    // sqrt() curve gives strong blur without huge radius
+    // If we don't have any mask yet (no detections, no manual selection),
+    // DO NOT blur the whole image – just show original.
+    if (m_cumulativeBlurMask.isNull() ||
+        m_cumulativeBlurMask.size() != m_original.size()) {
+        m_blurred = m_original;
+        m_cachedBlurStrength = -1;
+        m_cachedBlurredImage = QPixmap();
+        emit imagesUpdated(m_original, m_blurred);
+        return;
+    }
+
+    // Map slider [0..100] to a blur radius [0..30]
     int radius = static_cast<int>(std::sqrt(strength) * 3.0);
     if (radius > 30)
         radius = 30;
 
+    // Strength 0 → no blur, but KEEP the mask (so user can re-blur later)
     if (radius <= 0) {
         m_blurred = m_original;
-        m_cumulativeBlurMask = QImage();
         m_cachedBlurStrength = -1;
+        m_cachedBlurredImage = QPixmap();
+        emit imagesUpdated(m_original, m_blurred);
         return;
     }
 
-    // Check cache first
+    // Cache: if same strength and mask hasn't changed, reuse
     if (m_cachedBlurStrength == strength && !m_cachedBlurredImage.isNull()) {
         m_blurred = m_cachedBlurredImage;
-        // Do NOT set m_cumulativeBlurMask here — cumulative mask should track user selection-based edits only.
+        emit imagesUpdated(m_original, m_blurred);
         return;
     }
 
-    // Compute blur and cache it
-    QImage src = m_original.toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);
-    QImage blurred = boxBlur(src, radius);
-    m_blurred = QPixmap::fromImage(blurred);
-    
-    // Cache for next time
+    // Start from ORIGINAL image
+    QImage base    = m_original.toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    QImage blurred = boxBlur(base, radius);
+    QImage result  = base;
+
+    const int w = result.width();
+    const int h = result.height();
+
+    QImage maskImg = m_cumulativeBlurMask;
+
+    // Blend blurred into result where mask is white/opaque
+    for (int y = 0; y < h; ++y) {
+        QRgb *resLine        = reinterpret_cast<QRgb *>(result.scanLine(y));
+        const QRgb *blurLine = reinterpret_cast<const QRgb *>(blurred.constScanLine(y));
+        const QRgb *maskLine = reinterpret_cast<const QRgb *>(maskImg.constScanLine(y));
+
+        for (int x = 0; x < w; ++x) {
+            QRgb m = maskLine[x];
+            if (qAlpha(m) > 0 && qGray(m) > 0) {
+                resLine[x] = blurLine[x];
+            }
+        }
+    }
+
+    m_blurred = QPixmap::fromImage(result);
     m_cachedBlurStrength = strength;
     m_cachedBlurredImage = m_blurred;
+
+    emit imagesUpdated(m_original, m_blurred);
 }
+
 
 void SessionController::applyFakeBlur(int strength, const QImage &mask)
 {
@@ -165,6 +206,7 @@ void SessionController::applyFakeBlur(int strength, const QImage &mask)
         return;
 
     if (mask.isNull() || mask.size() != m_original.size()) {
+        // Fallback: use global-mask path (but it still only blurs inside mask, see above)
         applyFakeBlur(strength);
         return;
     }
@@ -176,15 +218,14 @@ void SessionController::applyFakeBlur(int strength, const QImage &mask)
 
     if (radius <= 0) {
         m_blurred = m_original;
-        m_cumulativeBlurMask = QImage();
+        // IMPORTANT: do NOT wipe detection mask here, user might just want "no blur"
+        emit imagesUpdated(m_original, m_blurred);
         return;
     }
 
     // Start from the ORIGINAL image
     QImage base    = m_original.toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);
     QImage blurred = boxBlur(base, radius);
-    
-    // Result starts as original
     QImage result  = base;
 
     const int w = result.width();
@@ -192,10 +233,11 @@ void SessionController::applyFakeBlur(int strength, const QImage &mask)
 
     // Build effective mask: union of cumulative mask and new mask
     QImage effectiveMask = mask;
-    if (!m_cumulativeBlurMask.isNull()) {
+    if (!m_cumulativeBlurMask.isNull() &&
+        m_cumulativeBlurMask.size() == mask.size()) {
         for (int y = 0; y < h; ++y) {
-            QRgb *maskLine     = reinterpret_cast<QRgb *>(effectiveMask.scanLine(y));
-            const QRgb *cumMaskLine = reinterpret_cast<const QRgb *>(m_cumulativeBlurMask.constScanLine(y));
+            QRgb *maskLine           = reinterpret_cast<QRgb *>(effectiveMask.scanLine(y));
+            const QRgb *cumMaskLine  = reinterpret_cast<const QRgb *>(m_cumulativeBlurMask.constScanLine(y));
             for (int x = 0; x < w; ++x) {
                 int grayEff = qGray(maskLine[x]);
                 int grayCum = qGray(cumMaskLine[x]);
@@ -220,18 +262,17 @@ void SessionController::applyFakeBlur(int strength, const QImage &mask)
     }
 
     m_blurred = QPixmap::fromImage(result);
-    
-    // Invalidate cache since we modified the image with a mask
+
+    // Invalidate slider cache since mask changed
     m_cachedBlurStrength = -1;
-    
+    m_cachedBlurredImage = QPixmap();
+
     // Update cumulative blur mask
-    if (m_cumulativeBlurMask.isNull()) {
-        m_cumulativeBlurMask = mask;
-    } else {
-        // Already merged above, update it
-        m_cumulativeBlurMask = effectiveMask;
-    }
+    m_cumulativeBlurMask = effectiveMask;
+
+    emit imagesUpdated(m_original, m_blurred);
 }
+
 
 
 void SessionController::adoptComputedFullBlur(const QPixmap &pixmap, int strength)
@@ -267,9 +308,9 @@ void SessionController::removeBlur(const QImage &mask)
         // Get the blurred version of the entire image
         int radius = static_cast<int>(std::sqrt(50) * 3.0);  // use midpoint blur for reconstruction
         if (radius > 30) radius = 30;
-        
+
         QImage blurredFull = boxBlur(result, radius);
-        
+
         // Copy blurred where cumulative mask says we should blur, but NOT where removal mask says
         for (int y = 0; y < h; ++y) {
             QRgb *resLine        = reinterpret_cast<QRgb *>(result.scanLine(y));
@@ -280,7 +321,7 @@ void SessionController::removeBlur(const QImage &mask)
             for (int x = 0; x < w; ++x) {
                 int grayCum = qGray(cumMaskLine[x]);
                 int grayRem = qGray(removalMaskLine[x]);
-                
+
                 // Blur if in cumulative mask AND NOT in removal mask
                 if (grayCum > 0 && grayRem == 0) {
                     resLine[x] = blurLine[x];
@@ -290,7 +331,7 @@ void SessionController::removeBlur(const QImage &mask)
     }
 
     m_blurred = QPixmap::fromImage(result);
-    
+
     // Invalidate cache since we modified the image
     m_cachedBlurStrength = -1;
 
@@ -316,7 +357,7 @@ void SessionController::pushState()
     if (!m_blurred.isNull()) {
         m_undoStack.push_back(m_blurred);
     }
-    m_redoStack.clear(); 
+    m_redoStack.clear();
 }
 
 void SessionController::undo()
@@ -330,7 +371,7 @@ void SessionController::undo()
     // Pop last state from undo stack
     m_blurred = m_undoStack.last();
     m_undoStack.removeLast();
-    
+
     // Invalidate blur cache since state changed
     m_cachedBlurStrength = -1;
 }
@@ -346,7 +387,7 @@ void SessionController::redo()
     // Restore next redo state
     m_blurred = m_redoStack.last();
     m_redoStack.removeLast();
-    
+
     // Invalidate blur cache since state changed
     m_cachedBlurStrength = -1;
 
@@ -355,9 +396,18 @@ void SessionController::redo()
 
 bool SessionController::autoBlurWithPythonDetections(int strength, QString *errorMessage)
 {
+    Q_UNUSED(strength); // detection no longer depends on blur strength
+
     if (m_original.isNull()) {
         if (errorMessage) *errorMessage = "No image loaded in session.";
         return false;
+    }
+
+    // If we've already run detection for this image, just re-emit
+    if (m_hasDetectionMask) {
+        emit detectionsUpdated(m_autoBoxes);
+        emit imagesUpdated(m_original, m_blurred); // after image stays whatever it currently is
+        return true;
     }
 
     QDir appDir(QCoreApplication::applicationDirPath()); // .../build/bin/Release
@@ -367,12 +417,8 @@ bool SessionController::autoBlurWithPythonDetections(int strength, QString *erro
     rootDir.cdUp(); // bin -> build
     rootDir.cdUp(); // build -> Project   (repo root)
 
-    // Now build paths from the root
     const QString scriptPath = rootDir.filePath("src/python/liquor_detect.py");
-    const QString modelPath  = rootDir.filePath("models/alcohol-detector.pt"); // adjust name if needed
-    qDebug() << "AppDir:" << appDir.absolutePath();
-    qDebug() << "Script path:" << scriptPath;
-    qDebug() << "Model path:"  << modelPath;
+    const QString modelPath  = rootDir.filePath("models/alcohol-detector.pt");
 
     if (!QFileInfo::exists(scriptPath)) {
         if (errorMessage) {
@@ -402,8 +448,8 @@ bool SessionController::autoBlurWithPythonDetections(int strength, QString *erro
         return false;
     }
 
-    // Build and run the Python process
-    QString pythonExe = "python"; // or "python.exe" on Windows; assumes on PATH
+    // Run Python
+    QString pythonExe = "python";
 
     QStringList args;
     args << scriptPath
@@ -440,7 +486,7 @@ bool SessionController::autoBlurWithPythonDetections(int strength, QString *erro
         return false;
     }
 
-    // ---- JSON parsing: use only the last non-empty line from stdout ----
+    // ---- Parse only last JSON line from stdout ----
     QByteArray trimmed = rawStdOut.trimmed();
     int lastNewline = trimmed.lastIndexOf('\n');
     QByteArray jsonBytes = (lastNewline == -1)
@@ -467,8 +513,10 @@ bool SessionController::autoBlurWithPythonDetections(int strength, QString *erro
         return false;
     }
 
-    // Build a selection mask the same size as the original image
+    // Build detection rectangles & mask at original image resolution
     const QSize imgSize = m_original.size();
+    const QRect imgRect(QPoint(0, 0), imgSize);
+
     QImage mask(imgSize, QImage::Format_ARGB32_Premultiplied);
     mask.fill(Qt::transparent);
 
@@ -476,8 +524,7 @@ bool SessionController::autoBlurWithPythonDetections(int strength, QString *erro
     painter.setPen(Qt::NoPen);
     painter.setBrush(Qt::white);
 
-    const QRect imgRect(QPoint(0, 0), imgSize);
-
+    m_autoBoxes.clear();
     for (const QJsonValue &v : dets) {
         QJsonObject o = v.toObject();
         int x = o.value("x").toInt();
@@ -489,20 +536,21 @@ bool SessionController::autoBlurWithPythonDetections(int strength, QString *erro
         r = r.intersected(imgRect);
         if (!r.isEmpty()) {
             painter.drawRect(r);
+            m_autoBoxes.push_back(r);
         }
     }
-
     painter.end();
 
-    // Save current blurred state for undo
-    pushState();
+    // Store detection state for this image
+    m_cumulativeBlurMask = mask;
+    m_hasDetectionMask   = true;
 
-    // Use your existing selection-based blur pipeline
-    applyFakeBlur(strength, mask);
+    // Make sure blurred is still the original (no blur yet)
+    m_blurred = m_original;
+
+    // Notify UI: outlines + images
+    emit detectionsUpdated(m_autoBoxes);
+    emit imagesUpdated(m_original, m_blurred);
 
     return true;
 }
-
-
-
-
