@@ -1,0 +1,7 @@
+set(__QT_DEPLOY_TARGET_cleanshare_core_FILE D:/Code/CISC320/Project/build/lib/RelWithDebInfo/cleanshare_core.lib)
+set(__QT_DEPLOY_TARGET_cleanshare_core_TYPE STATIC_LIBRARY)
+set(__QT_DEPLOY_TARGET_cleanshare_presentation_FILE D:/Code/CISC320/Project/build/lib/RelWithDebInfo/cleanshare_presentation.lib)
+set(__QT_DEPLOY_TARGET_cleanshare_presentation_TYPE STATIC_LIBRARY)
+set(__QT_DEPLOY_TARGET_cleanshare_app_FILE D:/Code/CISC320/Project/build/bin/RelWithDebInfo/CleanShare.exe)
+set(__QT_DEPLOY_TARGET_cleanshare_app_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_cleanshare_app_RUNTIME_DLLS D:/OpenCV/opencv/build/x64/vc16/bin/opencv_world4120.dll;D:/OpenCV/opencv/build/x64/vc16/bin/opencv_world4120.dll;D:/OpenCV/opencv/build/x64/vc16/bin/opencv_world4120.dll;C:/Qt/6.10.0/msvc2022_64/bin/Qt6Widgets.dll;C:/Qt/6.10.0/msvc2022_64/bin/Qt6Gui.dll;C:/Qt/6.10.0/msvc2022_64/bin/Qt6Core.dll)
