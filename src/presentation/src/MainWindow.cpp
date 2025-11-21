@@ -2,6 +2,7 @@
 #include "ImageCanvas.h"
 
 #include <QStackedWidget>
+#include <QApplication>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QWidget>
@@ -406,6 +407,8 @@ void MainWindow::onBlurDebounceTimeout()
     }
 }
 
+
+
 void MainWindow::onDetectClicked()
 {
     if (!m_session.hasImage()) {
@@ -413,14 +416,37 @@ void MainWindow::onDetectClicked()
             this,
             "No image",
             "Please upload an image first."
-            );
+        );
         return;
     }
 
-    // Trigger same background blur flow as slider release
-    m_pendingBlurValue = m_blurSlider->value();
-    onBlurDebounceTimeout();
+    const int strength = m_blurSlider->value();
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QString error;
+    bool ok = m_session.autoBlurWithPythonDetections(strength, &error);
+    QApplication::restoreOverrideCursor();
+
+    if (!ok) {
+        if (error.isEmpty()) {
+            error = "Python detector failed. Check that Python, the model .pt file, and the ultralytics package are installed.";
+        }
+        QMessageBox::warning(
+            this,
+            "Detection failed",
+            error
+        );
+        return;
+    }
+
+    // We just modified the session's blurred image; refresh the preview
+    showImageInPanels();
+
+    // Ensure slider is enabled now that some blur exists
+    if (!m_blurSlider->isEnabled())
+        m_blurSlider->setEnabled(true);
 }
+
 
 void MainWindow::onBackgroundBlurFinished()
 {

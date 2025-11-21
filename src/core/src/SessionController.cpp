@@ -3,6 +3,18 @@
 #include <QImage>
 #include <QtMath>
 
+
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
+#include <QTemporaryDir>
+#include <QProcess>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QPainter>
+#include <QDebug>
+
 SessionController::SessionController()
     : m_currentImagePath()
     , m_original()
@@ -337,7 +349,160 @@ void SessionController::redo()
     
     // Invalidate blur cache since state changed
     m_cachedBlurStrength = -1;
+
+
 }
+
+bool SessionController::autoBlurWithPythonDetections(int strength, QString *errorMessage)
+{
+    if (m_original.isNull()) {
+        if (errorMessage) *errorMessage = "No image loaded in session.";
+        return false;
+    }
+
+    QDir appDir(QCoreApplication::applicationDirPath()); // .../build/bin/Release
+
+    QDir rootDir = appDir;
+    rootDir.cdUp(); // Release -> bin
+    rootDir.cdUp(); // bin -> build
+    rootDir.cdUp(); // build -> Project   (repo root)
+
+    // Now build paths from the root
+    const QString scriptPath = rootDir.filePath("src/python/liquor_detect.py");
+    const QString modelPath  = rootDir.filePath("models/alcohol-detector.pt"); // adjust name if needed
+    qDebug() << "AppDir:" << appDir.absolutePath();
+    qDebug() << "Script path:" << scriptPath;
+    qDebug() << "Model path:"  << modelPath;
+
+    if (!QFileInfo::exists(scriptPath)) {
+        if (errorMessage) {
+            *errorMessage = QString("Detection script not found at %1").arg(scriptPath);
+        }
+        return false;
+    }
+
+    if (!QFileInfo::exists(modelPath)) {
+        if (errorMessage) {
+            *errorMessage = QString("Model .pt not found at %1").arg(modelPath);
+        }
+        return false;
+    }
+
+    // Save the current original image to a temporary PNG for Python
+    QTemporaryDir tempDir;
+    if (!tempDir.isValid()) {
+        if (errorMessage) *errorMessage = "Failed to create temporary directory for detector.";
+        return false;
+    }
+
+    const QString imagePath = tempDir.path() + "/input.png";
+    QImage src = m_original.toImage().convertToFormat(QImage::Format_ARGB32);
+    if (!src.save(imagePath, "PNG")) {
+        if (errorMessage) *errorMessage = "Failed to write temporary PNG for detector.";
+        return false;
+    }
+
+    // Build and run the Python process
+    QString pythonExe = "python"; // or "python.exe" on Windows; assumes on PATH
+
+    QStringList args;
+    args << scriptPath
+         << "--image" << imagePath
+         << "--model" << modelPath;
+
+    QProcess proc;
+    proc.start(pythonExe, args);
+
+    if (!proc.waitForStarted(5000)) {
+        if (errorMessage) {
+            *errorMessage = QString("Failed to start Python (%1): %2")
+                                .arg(pythonExe, proc.errorString());
+        }
+        return false;
+    }
+
+    if (!proc.waitForFinished(-1)) {
+        if (errorMessage) *errorMessage = "Python detector did not finish.";
+        return false;
+    }
+
+    const int exitCode = proc.exitCode();
+    QByteArray rawStdOut = proc.readAllStandardOutput();
+    QByteArray rawStdErr = proc.readAllStandardError();
+
+    if (exitCode != 0) {
+        QString msg = QString::fromLocal8Bit(rawStdErr.isEmpty() ? rawStdOut : rawStdErr);
+        if (errorMessage) {
+            *errorMessage = QString("Python detector failed (exit %1): %2")
+                                .arg(exitCode)
+                                .arg(msg.trimmed());
+        }
+        return false;
+    }
+
+    // ---- JSON parsing: use only the last non-empty line from stdout ----
+    QByteArray trimmed = rawStdOut.trimmed();
+    int lastNewline = trimmed.lastIndexOf('\n');
+    QByteArray jsonBytes = (lastNewline == -1)
+        ? trimmed
+        : trimmed.mid(lastNewline + 1).trimmed();
+
+    QJsonParseError parseErr;
+    QJsonDocument doc = QJsonDocument::fromJson(jsonBytes, &parseErr);
+    if (parseErr.error != QJsonParseError::NoError || !doc.isObject()) {
+        if (errorMessage) {
+            *errorMessage = QString("Failed to parse detector JSON: %1\nRaw stdout:\n%2")
+                                .arg(parseErr.errorString(),
+                                     QString::fromLocal8Bit(trimmed));
+        }
+        return false;
+    }
+
+    QJsonObject root = doc.object();
+    QJsonArray dets = root.value("detections").toArray();
+    if (dets.isEmpty()) {
+        if (errorMessage) {
+            *errorMessage = "Detector returned no boxes. Nothing to blur.";
+        }
+        return false;
+    }
+
+    // Build a selection mask the same size as the original image
+    const QSize imgSize = m_original.size();
+    QImage mask(imgSize, QImage::Format_ARGB32_Premultiplied);
+    mask.fill(Qt::transparent);
+
+    QPainter painter(&mask);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(Qt::white);
+
+    const QRect imgRect(QPoint(0, 0), imgSize);
+
+    for (const QJsonValue &v : dets) {
+        QJsonObject o = v.toObject();
+        int x = o.value("x").toInt();
+        int y = o.value("y").toInt();
+        int w = o.value("w").toInt();
+        int h = o.value("h").toInt();
+
+        QRect r(x, y, w, h);
+        r = r.intersected(imgRect);
+        if (!r.isEmpty()) {
+            painter.drawRect(r);
+        }
+    }
+
+    painter.end();
+
+    // Save current blurred state for undo
+    pushState();
+
+    // Use your existing selection-based blur pipeline
+    applyFakeBlur(strength, mask);
+
+    return true;
+}
+
 
 
 
