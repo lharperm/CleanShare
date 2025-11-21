@@ -8,7 +8,7 @@ class SessionController
 {
 public:
     SessionController();
-
+    bool autoBlurWithPythonDetections(int strength, QString *errorMessage = nullptr);
     bool loadImage(const QString &filePath);
 
     // Applies fake blur based on strength [0, 100]
