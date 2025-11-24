@@ -1,5 +1,5 @@
 CleanShare: Don't OverShare
-====================================================
+
 
 CleanShare is a privacy-focused desktop app that automatically detects and redacts alcoholic beverages in your photos using a locally running AI model. Nothing is uploaded or shared and all processing happens entirely on your Windows 10/11 device.
 
@@ -9,6 +9,7 @@ CleanShare Installation Instructions (Windows 10/11)
 ====================================================
 
 1. Download the Installer
+====================================================
 -------------------------
 Download the latest CleanShare installer from the project's GitHub Releases page:
 "CleanShare-Setup.exe"
@@ -17,6 +18,7 @@ If you do not see a release available, contact the CleanShare team.
 
 
 2. Run the Installer
+====================================================
 --------------------
 1. Double-click "CleanShare-Setup.exe"
 2. If Windows shows a security prompt, click "Yes" to allow installation.
@@ -27,6 +29,7 @@ If you do not see a release available, contact the CleanShare team.
 
 
 3. Launch CleanShare
+====================================================
 --------------------
 After installation, you can run CleanShare from:
 
@@ -37,6 +40,7 @@ After installation, you can run CleanShare from:
 
 
 4. What the Installer Includes
+====================================================
 ------------------------------
 The installer bundles all required components for CleanShare to run:
 
@@ -52,6 +56,7 @@ No separate installation of Qt, Python, or OpenCV is required.
 
 
 5. Uninstalling CleanShare
+====================================================
 ---------------------------
 To uninstall CleanShare:
 
