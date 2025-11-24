@@ -1,4 +1,5 @@
-CleanShare: Don't Overshare.
+CleanShare: Don't OverShare
+====================================================
 
 CleanShare is a privacy-focused desktop app that automatically detects and redacts alcoholic beverages in your photos using a locally running AI model. Nothing is uploaded or shared and all processing happens entirely on your Windows 10/11 device.
 
