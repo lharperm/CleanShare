@@ -16,7 +16,7 @@ Download the latest CleanShare installer from the project's GitHub Releases page
 If you do not see a release available, contact the CleanShare team.
 
 
-2. Run the Installer
+**2. Run the Installer**
 --------------------
 1. Double-click "CleanShare-Setup.exe"
 2. If Windows shows a security prompt, click "Yes" to allow installation.
@@ -26,7 +26,7 @@ If you do not see a release available, contact the CleanShare team.
 4. Click "Install" to complete the setup.
 
 
-3. Launch CleanShare
+**3. Launch CleanShare**
 --------------------
 After installation, you can run CleanShare from:
 
@@ -36,7 +36,7 @@ After installation, you can run CleanShare from:
   C:\Program Files\CleanShare\CleanShare.exe
 
 
-4. What the Installer Includes
+**4. What the Installer Includes**
 ------------------------------
 The installer bundles all required components for CleanShare to run:
 
@@ -51,7 +51,7 @@ The installer bundles all required components for CleanShare to run:
 No separate installation of Qt, Python, or OpenCV is required.
 
 
-5. Uninstalling CleanShare
+**5. Uninstalling CleanShare**
 ---------------------------
 To uninstall CleanShare:
 
