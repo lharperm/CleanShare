@@ -1,12 +1,22 @@
+# Qt / CMake / Build artifacts
+build/
 *.user
+*.user.*
 *.autosave
-CMakeCache.txt
+*.pro.user
+*.qmake.stash
 CMakeFiles/
-*.a
+CMakeCache.txt
+*.cmake
 *.o
 *.obj
-*.pdb
-*.dll
-*.lib
-*.ninja
-*.ninja_log
+*.moc
+*_autogen/
+
+# VSCode/IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
