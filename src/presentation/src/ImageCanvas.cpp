@@ -83,7 +83,7 @@ void ImageCanvas::paintEvent(QPaintEvent *event)
     // Draw detection rectangles (yellow) in widget coordinates
     if (!m_detectionBoxes.isEmpty() &&
         !m_originalImage.isNull() &&
-        !m_scaledImage.isNull()) {git
+        !m_scaledImage.isNull()) {
 
         double sx = imgRect.width()  / static_cast<double>(m_originalImage.width());
         double sy = imgRect.height() / static_cast<double>(m_originalImage.height());
